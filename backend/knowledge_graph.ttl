@@ -1,0 +1,67 @@
+@prefix : <http://example.org/ontology/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Authors
+:Author_1 a :Author ;
+    :name "J.K. Rowling" ;
+    :birthYear "1965"^^xsd:gYear ;
+    :nationality "British" .
+
+:Author_2 a :Author ;
+    :name "George Orwell" ;
+    :birthYear "1903"^^xsd:gYear ;
+    :nationality "British" .
+
+:Author_3 a :Author ;
+    :name "Agatha Christie" ;
+    :birthYear "1890"^^xsd:gYear ;
+    :nationality "British" .
+
+:Author_4 a :Author ;
+    :name "Isaac Asimov" ;
+    :birthYear "1920"^^xsd:gYear ;
+    :nationality "American" .
+
+# Books
+:Book_1 a :Book ;
+    :title "Harry Potter and the Philosopher's Stone" ;
+    :author :Author_1 ;
+    :genre "Fantasy" ;
+    :publicationYear "1997"^^xsd:gYear .
+
+:Book_2 a :Book ;
+    :title "1984" ;
+    :author :Author_2 ;
+    :genre "Dystopian" ;
+    :publicationYear "1949"^^xsd:gYear .
+
+:Book_3 a :Book ;
+    :title "Animal Farm" ;
+    :author :Author_2 ;
+    :genre "Satire" ;
+    :publicationYear "1945"^^xsd:gYear .
+
+:Book_4 a :Book ;
+    :title "And Then There Were None" ;
+    :author :Author_3 ;
+    :genre "Mystery" ;
+    :publicationYear "1939"^^xsd:gYear .
+
+:Book_5 a :Book ;
+    :title "I, Robot" ;
+    :author :Author_4 ;
+    :genre "Science Fiction" ;
+    :publicationYear "1950"^^xsd:gYear .
+
+# Schema Definitions (simplified for this example)
+:Author rdfs:label "Author" .
+:Book rdfs:label "Book" .
+:name rdfs:label "name" .
+:birthYear rdfs:label "birth year" .
+:nationality rdfs:label "nationality" .
+:title rdfs:label "title" .
+:author rdfs:label "author" .
+:genre rdfs:label "genre" .
+:publicationYear rdfs:label "publication year" .
+
