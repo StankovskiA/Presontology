@@ -8,54 +8,41 @@ from rdflib.query import ResultRow
 from dotenv import load_dotenv
 import google.generativeai as genai
 import json
-import logging # Import the logging module
+import logging
 
 # Load environment variables from .env file
 load_dotenv()
 
 # --- Logging Configuration ---
-# Create a custom logger
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO) # Set the minimum logging level to INFO
+logger.setLevel(logging.INFO)
 
-# Create console handler and set level to INFO
 ch = logging.StreamHandler()
 ch.setLevel(logging.INFO)
 
-# Create formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-# Add formatter to ch
 ch.setFormatter(formatter)
-
-# Add ch to logger
 logger.addHandler(ch)
 
 # --- Configuration ---
-# Flask app initialization
 app = Flask(__name__)
-# Enable Cross-Origin Resource Sharing (CORS) for all routes.
-# In a production environment, you would restrict this to specific origins.
 CORS(app)
 
-# Load Gemini API Key from environment variables
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
-    # Use logger.error instead of print
-    logger.error("Error: GEMINI_API_KEY not found in .env file. Please set it.")
+    logger.error(
+        "Error: GEMINI_API_KEY not found in .env file. Please set it.")
     exit(1)
 
-# Configure the Google Generative AI with the API key
 genai.configure(api_key=GEMINI_API_KEY)
-
-# Initialize the Gemini model for conversational purposes
 model = genai.GenerativeModel('gemini-2.0-flash')
 
 # --- Knowledge Graph Loading ---
-# Initialize an RDF graph
 kg_graph = Graph()
-# Define the path to our sample knowledge graph file
 KG_FILE_PATH = 'knowledge_graph.ttl'
+
 
 def load_knowledge_graph():
     """
@@ -66,17 +53,20 @@ def load_knowledge_graph():
             logger.error(f"Knowledge graph file not found at {KG_FILE_PATH}")
             return False
         kg_graph.parse(KG_FILE_PATH, format="turtle")
-        logger.info(f"Knowledge graph loaded successfully from {KG_FILE_PATH}. Contains {len(kg_graph)} triples.")
+        logger.info(
+            f"Knowledge graph loaded successfully from {KG_FILE_PATH}. Contains {len(kg_graph)} triples.")
         return True
     except Exception as e:
         logger.error(f"Error loading knowledge graph: {e}")
         return False
 
-# Load the knowledge graph when the application starts
+
 if not load_knowledge_graph():
-    logger.error("Failed to load knowledge graph. Application may not function as expected.")
+    logger.error(
+        "Failed to load knowledge graph. Application may not function as expected.")
 
 # --- Helper Functions for Agent Logic ---
+
 
 def get_sparql_query_from_prompt(user_prompt: str) -> str | None:
     """
@@ -164,15 +154,16 @@ def get_sparql_query_from_prompt(user_prompt: str) -> str | None:
                     "properties": {
                         "sparql_query": {"type": "STRING"}
                     }
-                    # Removed "propertyOrdering": ["sparql_query"]
                 }
             )
         )
         if response.candidates and response.candidates[0].content and response.candidates[0].content.parts:
             raw_llm_response_text = response.candidates[0].content.parts[0].text
-            logger.info(f"Raw LLM response text: {raw_llm_response_text}")
+            logger.info(
+                f"Raw LLM (query generation) response text: {raw_llm_response_text}")
         else:
-            logger.warning("LLM response did not contain expected content structure.")
+            logger.warning(
+                "LLM (query generation) response did not contain expected content structure.")
             return None
 
         json_string = raw_llm_response_text
@@ -180,11 +171,13 @@ def get_sparql_query_from_prompt(user_prompt: str) -> str | None:
         sparql_query = parsed_json.get("sparql_query")
         return sparql_query
     except json.JSONDecodeError as e:
-        logger.error(f"JSON decoding error from LLM response: {e}. Response was: {raw_llm_response_text}")
+        logger.error(
+            f"JSON decoding error from LLM (query generation) response: {e}. Response was: {raw_llm_response_text}")
         return None
     except Exception as e:
         logger.error(f"Error generating SPARQL query with LLM: {e}")
         return None
+
 
 def execute_sparql_query(query: str) -> list[dict]:
     """
@@ -198,17 +191,62 @@ def execute_sparql_query(query: str) -> list[dict]:
             for var in results.vars:
                 value = row[var]
                 if isinstance(value, URIRef):
-                    row_dict[str(var)] = str(value)
+                    # For URIRefs, extract the last part of the URI for cleaner display
+                    clean_value = str(value).split('/')[-1].replace('_', ' ')
+                    row_dict[str(var)] = clean_value
                 elif isinstance(value, Literal):
                     row_dict[str(var)] = str(value)
                 else:
                     row_dict[str(var)] = value
             results_list.append(row_dict)
-        logger.info(f"Successfully executed SPARQL query. Results count: {len(results_list)}")
+        logger.info(
+            f"Successfully executed SPARQL query. Results count: {len(results_list)}")
         return results_list
     except Exception as e:
         logger.error(f"Error executing SPARQL query: {e}")
         return []
+
+
+def synthesize_human_readable_response(user_prompt: str, query_results: list[dict]) -> str:
+    """
+    Uses the Gemini LLM to synthesize a human-readable response from the query results.
+    """
+    if not query_results:
+        return "I couldn't find any information related to your request in the knowledge graph."
+
+    # Convert results to a more digestible string format for the LLM
+    # Example: [{"authorName": "J.K. Rowling"}, {"authorName": "George Orwell"}]
+    # becomes "authorName: J.K. Rowling, authorName: George Orwell"
+    results_string = ", ".join([
+        f"{key}: {value}" for result_dict in query_results for key, value in result_dict.items()
+    ])
+
+    llm_prompt = f"""
+    You are a helpful AI assistant that summarizes information from a knowledge graph.
+    Given the user's original question and the structured results from a knowledge graph query,
+    synthesize a concise, natural language answer. If the results are empty, state that no information was found.
+
+    Original Question: "{user_prompt}"
+    Knowledge Graph Results: {json.dumps(query_results)}
+
+    Synthesized Answer:
+    """
+    try:
+        response = model.generate_content([llm_prompt])
+        if response.candidates and response.candidates[0].content and response.candidates[0].content.parts:
+            synthesized_text = response.candidates[0].content.parts[0].text
+            logger.info(
+                f"Raw LLM (response synthesis) text: {synthesized_text}")
+            return synthesized_text
+        else:
+            logger.warning(
+                "LLM (response synthesis) response did not contain expected content.")
+            return "I couldn't generate a clear answer based on the results."
+    except Exception as e:
+        logger.error(
+            f"Error synthesizing human-readable response with LLM: {e}")
+        return "An error occurred while synthesizing the answer."
+
 
 # --- API Endpoints ---
 
@@ -219,6 +257,7 @@ def home():
     """
     logger.info("Home route accessed.")
     return "AI Knowledge Graph Agent Backend is running!"
+
 
 @app.route('/query', methods=['POST'])
 def query_kg():
@@ -258,21 +297,22 @@ def query_kg():
     # Step 2: Execute the generated SPARQL query
     query_results = execute_sparql_query(sparql_query)
 
-    if not query_results:
-        logger.info("No results found for the generated SPARQL query.")
-        return jsonify({
-            "user_prompt": user_prompt,
-            "agent_response": f"I found no information related to '{user_prompt}' in the knowledge graph. "
-                              f"Perhaps try a different query or check the knowledge graph content."
-        })
+    # Step 3: Use LLM to synthesize human-readable response from query_results.
+    # Pass both user_prompt and query_results to the synthesis function
+    agent_final_response = synthesize_human_readable_response(
+        user_prompt, query_results)
 
     logger.info(f"Query results: {query_results}")
+    logger.info(f"Agent's final response: {agent_final_response}")
+
     return jsonify({
         "user_prompt": user_prompt,
-        "sparql_query": sparql_query,
-        "raw_query_results": query_results,
-        "agent_response": "Raw query results are displayed. Next, I will synthesize this into a human-readable response."
+        "sparql_query": sparql_query,  # Still include for debugging/transparency
+        "raw_query_results": query_results,  # Still include for debugging/transparency
+        # This is the new, human-readable response!
+        "agent_response": agent_final_response
     })
+
 
 # --- Main entry point for running the Flask app ---
 if __name__ == '__main__':
