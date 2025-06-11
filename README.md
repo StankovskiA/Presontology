@@ -66,7 +66,7 @@ cd backend
 # 4.1. Create a Sample Knowledge Graph
 # Create a file named 'knowledge_graph.ttl' inside the backend directory
 # and populate it with your Turtle data.
-# Example content (copy and paste into knowledge_graph.ttl):
+# Example content for knowledge_graph.ttl (to be saved in backend/knowledge_graph.ttl):
 # (Content for knowledge_graph.ttl is provided separately in the project conversation flow.)
 
 # 4.2. Create and Activate a Python Virtual Environment
@@ -79,7 +79,7 @@ source venv/bin/activate
 # .\venv\Scripts\Activate.ps1
 
 # 4.3. Install Required Python Packages
-pip install Flask rdflib python-dotenv google-generativeai
+pip install Flask Flask-Cors rdflib python-dotenv google-generativeai
 
 # 4.4. Generate requirements.txt
 pip freeze > requirements.txt
@@ -91,8 +91,18 @@ pip freeze > requirements.txt
 # Remember to replace "YOUR_GEMINI_API_KEY_HERE" with your actual API key.
 
 Usage
+1. Run the Backend Server
 
-(Instructions on how to run the application will be added here)
+Ensure you are in the backend directory and your virtual environment is active.
+
+cd backend
+source venv/bin/activate # or your platform's equivalent activation command
+python app.py
+
+The backend server will start on http://127.0.0.1:5000/ (or localhost:5000). You should see output indicating the Flask server is running and the knowledge graph has been loaded.
+2. Run the Frontend Application
+
+(Instructions on how to run the frontend will be added here)
 Contributing
 
 (Guidelines for contributions will be added here)
