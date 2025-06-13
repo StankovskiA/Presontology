@@ -1,864 +1,834 @@
 @prefix : <http://example.org/scientific-presentation-ontology#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://w3c.org/scientific-presentation-ontology> .
+
+<http://w3c.org/scientific-presentation-ontology> rdf:type owl:Ontology ;
+                                                   owl:versionIRI <http://example.org/scientific-presentation-ontology/2.0> ;
+                                                   dc:creator "Ontology Engineering Expert" ;
+                                                   dc:description """Comprehensive ontology for evaluating and guiding scientific presentations based on slide text analysis.
+
+
+Developed by team Dragon at ISWS - International Semantic Web Summer school 2025.
+Team members, in alphabetical order:
+
+Adriana Concha
+Chiara Gatto
+Antonios Georgakopoulos
+Maximilian Kissgen
+Nakul Mehta
+Aleksandar Stankovski
+
+supervised by:
+
+Stefano De Giorgis""" ;
+                                                   dc:title "Scientific Presentation Ontology" ;
+                                                   owl:versionInfo "2.0" .
 
 #################################################################
-#    Ontology Declaration
+#    Annotation properties
 #################################################################
 
-<http://example.org/scientific-presentation-ontology> rdf:type owl:Ontology ;
-    dc:title "Scientific Presentation Ontology" ;
-    dc:description "Comprehensive ontology for evaluating and guiding scientific presentations based on slide text analysis" ;
-    dc:creator "Ontology Engineering Expert" ;
-    owl:versionInfo "2.0" ;
-    owl:versionIRI <http://example.org/scientific-presentation-ontology/2.0> .
+###  http://purl.org/dc/elements/1.1/creator
+dc:creator rdf:type owl:AnnotationProperty .
 
-#################################################################
-#    Classes
-#################################################################
 
-### Core Presentation Classes
-:ScientificPresentation rdf:type owl:Class ;
-    rdfs:label "Scientific Presentation"@en ;
-    rdfs:comment "A formal presentation of scientific research or findings"@en .
+###  http://purl.org/dc/elements/1.1/description
+dc:description rdf:type owl:AnnotationProperty .
 
-:PresentationSection rdf:type owl:Class ;
-    rdfs:label "Presentation Section"@en ;
-    rdfs:comment "A distinct section or component of a scientific presentation"@en .
 
-:ScientificTopic rdf:type owl:Class ;
-    rdfs:label "Scientific Topic"@en ;
-    rdfs:comment "A specific scientific domain or research area addressed in the presentation"@en .
+###  http://purl.org/dc/elements/1.1/title
+dc:title rdf:type owl:AnnotationProperty .
 
-### Presentation Types
-:ConferencePresentation rdf:type owl:Class ;
-    rdfs:subClassOf :ScientificPresentation ;
-    rdfs:label "Conference Presentation"@en ;
-    rdfs:comment "A presentation given at a scientific conference"@en .
-
-:KeynotePresentation rdf:type owl:Class ;
-    rdfs:subClassOf :ScientificPresentation ;
-    rdfs:label "Keynote Presentation"@en ;
-    rdfs:comment "A main or featured presentation at a conference or event"@en .
-
-:WorkshopPresentation rdf:type owl:Class ;
-    rdfs:subClassOf :ScientificPresentation ;
-    rdfs:label "Workshop Presentation"@en ;
-    rdfs:comment "A presentation given in a workshop or training session"@en .
-
-### Standard Presentation Sections
-:Introduction rdf:type owl:Class ;
-    rdfs:subClassOf :PresentationSection ;
-    rdfs:label "Introduction"@en ;
-    rdfs:comment "Opening section that introduces the topic and context"@en .
-
-:Methods rdf:type owl:Class ;
-    rdfs:subClassOf :PresentationSection ;
-    rdfs:label "Methods"@en ;
-    rdfs:comment "Section describing research methodology and approach"@en .
-
-:Results rdf:type owl:Class ;
-    rdfs:subClassOf :PresentationSection ;
-    rdfs:label "Results"@en ;
-    rdfs:comment "Section presenting research findings and data"@en .
-
-:Discussion rdf:type owl:Class ;
-    rdfs:subClassOf :PresentationSection ;
-    rdfs:label "Discussion"@en ;
-    rdfs:comment "Section interpreting results and their implications"@en .
-
-:Conclusion rdf:type owl:Class ;
-    rdfs:subClassOf :PresentationSection ;
-    rdfs:label "Conclusion"@en ;
-    rdfs:comment "Final section summarizing key findings and takeaways"@en .
-
-:LiteratureReview rdf:type owl:Class ;
-    rdfs:subClassOf :PresentationSection ;
-    rdfs:label "Literature Review"@en ;
-    rdfs:comment "Section reviewing relevant prior research and literature"@en .
-
-:FutureWork rdf:type owl:Class ;
-    rdfs:subClassOf :PresentationSection ;
-    rdfs:label "Future Work"@en ;
-    rdfs:comment "Section outlining planned or potential future research"@en .
-
-:ProblemStatement rdf:type owl:Class ;
-    rdfs:subClassOf :PresentationSection ;
-    rdfs:label "Problem Statement"@en ;
-    rdfs:comment "Section defining the research problem or question"@en .
-
-:Roadmap rdf:type owl:Class ;
-    rdfs:subClassOf :PresentationSection ;
-    rdfs:label "Roadmap"@en ;
-    rdfs:comment "Section providing overview of presentation structure"@en .
-
-### Audience and Context
-:Audience rdf:type owl:Class ;
-    rdfs:label "Audience"@en ;
-    rdfs:comment "The target audience for a scientific presentation"@en .
-
-:InterdisciplinaryAudience rdf:type owl:Class ;
-    rdfs:subClassOf :Audience ;
-    rdfs:label "Interdisciplinary Audience"@en ;
-    rdfs:comment "Audience with diverse disciplinary backgrounds"@en .
-
-:SpecializedAudience rdf:type owl:Class ;
-    rdfs:subClassOf :Audience ;
-    rdfs:label "Specialized Audience"@en ;
-    rdfs:comment "Audience with deep expertise in the presentation domain"@en .
-
-:MixedExpertiseAudience rdf:type owl:Class ;
-    rdfs:subClassOf :Audience ;
-    rdfs:label "Mixed Expertise Audience"@en ;
-    rdfs:comment "Audience with varying levels of domain expertise"@en .
-
-:GeneralAudience rdf:type owl:Class ;
-    rdfs:subClassOf :Audience ;
-    rdfs:label "General Audience"@en ;
-    rdfs:comment "Non-specialist audience with limited domain knowledge"@en .
-
-### Content Elements
-:ContentElement rdf:type owl:Class ;
-    rdfs:label "Content Element"@en ;
-    rdfs:comment "A specific piece of content within a presentation"@en .
-
-:ScientificClaim rdf:type owl:Class ;
-    rdfs:subClassOf :ContentElement ;
-    rdfs:label "Scientific Claim"@en ;
-    rdfs:comment "A statement or assertion based on scientific evidence"@en .
-
-:DataVisualization rdf:type owl:Class ;
-    rdfs:subClassOf :ContentElement ;
-    rdfs:label "Data Visualization"@en ;
-    rdfs:comment "Visual representation of data or results"@en .
-
-:Methodology rdf:type owl:Class ;
-    rdfs:subClassOf :ContentElement ;
-    rdfs:label "Methodology"@en ;
-    rdfs:comment "Description of research methods and procedures"@en .
-
-:Citation rdf:type owl:Class ;
-    rdfs:subClassOf :ContentElement ;
-    rdfs:label "Citation"@en ;
-    rdfs:comment "Reference to external sources or prior work"@en .
-
-:Limitation rdf:type owl:Class ;
-    rdfs:subClassOf :ContentElement ;
-    rdfs:label "Limitation"@en ;
-    rdfs:comment "Acknowledgment of research constraints or weaknesses"@en .
-
-:Evidence rdf:type owl:Class ;
-    rdfs:subClassOf :ContentElement ;
-    rdfs:label "Evidence"@en ;
-    rdfs:comment "Supporting data or information for scientific claims"@en .
-
-:BackgroundInformation rdf:type owl:Class ;
-    rdfs:subClassOf :ContentElement ;
-    rdfs:label "Background Information"@en ;
-    rdfs:comment "Contextual information necessary for understanding"@en .
-
-:Hook rdf:type owl:Class ;
-    rdfs:subClassOf :ContentElement ;
-    rdfs:label "Hook"@en ;
-    rdfs:comment "Attention-grabbing opening element"@en .
-
-:TakeawayMessage rdf:type owl:Class ;
-    rdfs:subClassOf :ContentElement ;
-    rdfs:label "Takeaway Message"@en ;
-    rdfs:comment "Key message or finding the audience should remember"@en .
-
-:Transition rdf:type owl:Class ;
-    rdfs:subClassOf :ContentElement ;
-    rdfs:label "Transition"@en ;
-    rdfs:comment "Element connecting different sections or topics"@en .
-
-:ScientificDetail rdf:type owl:Class ;
-    rdfs:subClassOf :ContentElement ;
-    rdfs:label "Scientific Detail"@en ;
-    rdfs:comment "Specific technical or scientific information element"@en .
-
-### Quality and Assessment
-:QualityMetric rdf:type owl:Class ;
-    rdfs:label "Quality Metric"@en ;
-    rdfs:comment "A measure of presentation quality or effectiveness"@en .
-
-:ScientificRigor rdf:type owl:Class ;
-    rdfs:subClassOf :QualityMetric ;
-    rdfs:label "Scientific Rigor"@en ;
-    rdfs:comment "Measure of methodological soundness and accuracy"@en .
-
-:AudienceEngagement rdf:type owl:Class ;
-    rdfs:subClassOf :QualityMetric ;
-    rdfs:label "Audience Engagement"@en ;
-    rdfs:comment "Measure of audience attention and interaction"@en .
-
-:NarrativeCoherence rdf:type owl:Class ;
-    rdfs:subClassOf :QualityMetric ;
-    rdfs:label "Narrative Coherence"@en ;
-    rdfs:comment "Measure of logical flow and storytelling effectiveness"@en .
-
-:LinguisticQuality rdf:type owl:Class ;
-    rdfs:subClassOf :QualityMetric ;
-    rdfs:label "Linguistic Quality"@en ;
-    rdfs:comment "Measure of language clarity and grammatical correctness"@en .
-
-:TechnicalAccuracy rdf:type owl:Class ;
-    rdfs:subClassOf :QualityMetric ;
-    rdfs:label "Technical Accuracy"@en ;
-    rdfs:comment "Measure of correctness of technical content"@en .
-
-### Narrative and Engagement
-:NarrativeDevice rdf:type owl:Class ;
-    rdfs:label "Narrative Device"@en ;
-    rdfs:comment "A technique used to enhance storytelling and coherence"@en .
-
-:Analogy rdf:type owl:Class ;
-    rdfs:subClassOf :NarrativeDevice ;
-    rdfs:label "Analogy"@en ;
-    rdfs:comment "Comparison to familiar concepts for explanation"@en .
-
-:RhetoricalQuestion rdf:type owl:Class ;
-    rdfs:subClassOf :NarrativeDevice ;
-    rdfs:label "Rhetorical Question"@en ;
-    rdfs:comment "Question posed for effect rather than answer"@en .
-
-:RealWorldExample rdf:type owl:Class ;
-    rdfs:subClassOf :NarrativeDevice ;
-    rdfs:label "Real World Example"@en ;
-    rdfs:comment "Concrete example from everyday experience"@en .
-
-:StorytellingTechnique rdf:type owl:Class ;
-    rdfs:subClassOf :NarrativeDevice ;
-    rdfs:label "Storytelling Technique"@en ;
-    rdfs:comment "Narrative method to engage audience"@en .
-
-:Humor rdf:type owl:Class ;
-    rdfs:subClassOf :NarrativeDevice ;
-    rdfs:label "Humor"@en ;
-    rdfs:comment "Appropriate use of humor for engagement"@en .
-
-:EngagementStrategy rdf:type owl:Class ;
-    rdfs:label "Engagement Strategy"@en ;
-    rdfs:comment "A method for engaging and interacting with the audience"@en .
-
-:InteractivePoll rdf:type owl:Class ;
-    rdfs:subClassOf :EngagementStrategy ;
-    rdfs:label "Interactive Poll"@en ;
-    rdfs:comment "Live polling of audience responses"@en .
-
-:ThoughtExperiment rdf:type owl:Class ;
-    rdfs:subClassOf :EngagementStrategy ;
-    rdfs:label "Thought Experiment"@en ;
-    rdfs:comment "Hypothetical scenario for audience consideration"@en .
-
-:CallToAction rdf:type owl:Class ;
-    rdfs:subClassOf :EngagementStrategy ;
-    rdfs:label "Call to Action"@en ;
-    rdfs:comment "Request for audience to take specific action"@en .
-
-:QuestionAndAnswer rdf:type owl:Class ;
-    rdfs:subClassOf :EngagementStrategy ;
-    rdfs:label "Question and Answer"@en ;
-    rdfs:comment "Interactive Q&A session with audience"@en .
-
-:LiveDemonstration rdf:type owl:Class ;
-    rdfs:subClassOf :EngagementStrategy ;
-    rdfs:label "Live Demonstration"@en ;
-    rdfs:comment "Real-time demonstration of concepts or methods"@en .
-
-### Purpose and Intent
-:PresentationPurpose rdf:type owl:Class ;
-    rdfs:label "Presentation Purpose"@en ;
-    rdfs:comment "The intended goal or objective of a presentation"@en .
 
 #################################################################
 #    Object Properties
 #################################################################
 
-### Structural Relationships
-:hasSection rdf:type owl:ObjectProperty ;
-    rdfs:domain :ScientificPresentation ;
-    rdfs:range :PresentationSection ;
-    rdfs:label "has section"@en ;
-    rdfs:comment "Indicates that a presentation contains a specific section"@en .
-
-:hasRecommendedSection rdf:type owl:ObjectProperty ;
-    rdfs:subPropertyOf :hasSection ;
-    rdfs:domain :ScientificTopic ;
-    rdfs:range :PresentationSection ;
-    rdfs:label "has recommended section"@en ;
-    rdfs:comment "Indicates recommended sections for specific scientific topics"@en .
-
-:followedBy rdf:type owl:ObjectProperty ;
-    rdfs:domain :PresentationSection ;
-    rdfs:range :PresentationSection ;
-    rdfs:label "followed by"@en ;
-    rdfs:comment "Indicates the sequential order of presentation sections"@en .
-
-:hasLogicalSuccessor rdf:type owl:ObjectProperty ;
-    rdfs:subPropertyOf :followedBy ;
-    rdfs:label "has logical successor"@en ;
-    rdfs:comment "Indicates the logical next section in presentation flow"@en .
-
-:hasLogicalPredecessor rdf:type owl:ObjectProperty ;
-    owl:inverseOf :hasLogicalSuccessor ;
-    rdfs:label "has logical predecessor"@en ;
-    rdfs:comment "Indicates the logical previous section in presentation flow"@en .
-
-:contains rdf:type owl:ObjectProperty ;
-    rdfs:domain :PresentationSection ;
-    rdfs:range :ContentElement ;
-    rdfs:label "contains"@en ;
-    rdfs:comment "Indicates that a section contains specific content elements"@en .
-
-:targetedAt rdf:type owl:ObjectProperty ;
-    rdfs:domain :ScientificPresentation ;
-    rdfs:range :Audience ;
-    rdfs:label "targeted at"@en ;
-    rdfs:comment "Indicates the intended audience for a presentation"@en .
-
-### Narrative and Engagement
-:uses rdf:type owl:ObjectProperty ;
-    rdfs:domain :PresentationSection ;
-    rdfs:range :NarrativeDevice ;
-    rdfs:label "uses"@en ;
-    rdfs:comment "Indicates use of narrative devices in presentation sections"@en .
-
-:appliesTo rdf:type owl:ObjectProperty ;
-    rdfs:domain :NarrativeDevice ;
-    rdfs:range :PresentationSection ;
-    rdfs:label "applies to"@en ;
-    rdfs:comment "Indicates which sections a narrative device applies to"@en .
-
-:employs rdf:type owl:ObjectProperty ;
-    rdfs:domain :ScientificPresentation ;
-    rdfs:range :EngagementStrategy ;
-    rdfs:label "employs"@en ;
-    rdfs:comment "Indicates use of engagement strategies in presentations"@en .
-
-### Quality and Assessment
-:evaluatedBy rdf:type owl:ObjectProperty ;
-    rdfs:domain :ScientificPresentation ;
-    rdfs:range :QualityMetric ;
-    rdfs:label "evaluated by"@en ;
-    rdfs:comment "Indicates quality metrics used to assess presentations"@en .
-
-:requires rdf:type owl:ObjectProperty ;
-    rdfs:domain :ScientificClaim ;
-    rdfs:range :Citation ;
-    rdfs:label "requires"@en ;
-    rdfs:comment "Indicates that a claim requires citation support"@en .
-
-:supports rdf:type owl:ObjectProperty ;
-    rdfs:domain :Evidence ;
-    rdfs:range :ScientificClaim ;
-    rdfs:label "supports"@en ;
-    rdfs:comment "Indicates that evidence supports a scientific claim"@en .
-
+###  http://w3c.org/scientific-presentation-ontology#acknowledges
 :acknowledges rdf:type owl:ObjectProperty ;
-    rdfs:domain :ScientificPresentation ;
-    rdfs:range :Limitation ;
-    rdfs:label "acknowledges"@en ;
-    rdfs:comment "Indicates acknowledgment of research limitations"@en .
+              rdfs:domain :ScientificPresentation ;
+              rdfs:range :Limitation ;
+              rdfs:comment "Indicates acknowledgment of research limitations"@en ;
+              rdfs:label "acknowledges"@en .
 
-### Audience Adaptation
+
+###  http://w3c.org/scientific-presentation-ontology#adaptedFor
 :adaptedFor rdf:type owl:ObjectProperty ;
-    rdfs:domain :ContentElement ;
-    rdfs:range :Audience ;
-    rdfs:label "adapted for"@en ;
-    rdfs:comment "Indicates content adaptation for specific audiences"@en .
+            rdfs:domain :ContentElement ;
+            rdfs:range :Audience ;
+            rdfs:comment "Indicates content adaptation for specific audiences"@en ;
+            rdfs:label "adapted for"@en .
 
+
+###  http://w3c.org/scientific-presentation-ontology#appliesTo
+:appliesTo rdf:type owl:ObjectProperty ;
+           rdfs:domain :NarrativeDevice ;
+           rdfs:range :PresentationSection ;
+           rdfs:comment "Indicates which sections a narrative device applies to"@en ;
+           rdfs:label "applies to"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#appropriateFor
 :appropriateFor rdf:type owl:ObjectProperty ;
-    rdfs:domain :NarrativeDevice ;
-    rdfs:range :Audience ;
-    rdfs:label "appropriate for"@en ;
-    rdfs:comment "Indicates suitability of narrative devices for audiences"@en .
+                rdfs:domain :NarrativeDevice ;
+                rdfs:range :Audience ;
+                rdfs:comment "Indicates suitability of narrative devices for audiences"@en ;
+                rdfs:label "appropriate for"@en .
 
+
+###  http://w3c.org/scientific-presentation-ontology#contains
+:contains rdf:type owl:ObjectProperty ;
+          rdfs:domain :PresentationSection ;
+          rdfs:range :ContentElement ;
+          rdfs:comment "Indicates that a section contains specific content elements"@en ;
+          rdfs:label "contains"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#effectiveFor
 :effectiveFor rdf:type owl:ObjectProperty ;
-    rdfs:domain :EngagementStrategy ;
-    rdfs:range :Audience ;
-    rdfs:label "effective for"@en ;
-    rdfs:comment "Indicates effectiveness of engagement strategies for audiences"@en .
+              rdfs:domain :EngagementStrategy ;
+              rdfs:range :Audience ;
+              rdfs:comment "Indicates effectiveness of engagement strategies for audiences"@en ;
+              rdfs:label "effective for"@en .
 
-:isRelevantFor rdf:type owl:ObjectProperty ;
-    rdfs:domain :ScientificDetail ;
-    rdfs:range :Audience ;
-    rdfs:label "is relevant for"@en ;
-    rdfs:comment "Indicates relevance of scientific details for specific audiences"@en .
 
-### Content Management
-:simplifyContentItem rdf:type owl:ObjectProperty ;
-    rdfs:domain :ContentElement ;
-    rdfs:range :ContentElement ;
-    rdfs:label "simplify content item"@en ;
-    rdfs:comment "Indicates a simplified version of content for different audiences"@en .
+###  http://w3c.org/scientific-presentation-ontology#employs
+:employs rdf:type owl:ObjectProperty ;
+         rdfs:domain :ScientificPresentation ;
+         rdfs:range :EngagementStrategy ;
+         rdfs:comment "Indicates use of engagement strategies in presentations"@en ;
+         rdfs:label "employs"@en .
 
-:omitContentItem rdf:type owl:ObjectProperty ;
-    rdfs:domain :ContentElement ;
-    rdfs:range :ContentElement ;
-    rdfs:label "omit content item"@en ;
-    rdfs:comment "Indicates content that should be omitted for certain contexts"@en .
 
-#################################################################
-#    Data Properties
-#################################################################
+###  http://w3c.org/scientific-presentation-ontology#evaluatedBy
+:evaluatedBy rdf:type owl:ObjectProperty ;
+             rdfs:domain :ScientificPresentation ;
+             rdfs:range :QualityMetric ;
+             rdfs:comment "Indicates quality metrics used to assess presentations"@en ;
+             rdfs:label "evaluated by"@en .
 
-### Section Properties
-:sectionName rdf:type owl:DatatypeProperty ;
-    rdfs:domain :PresentationSection ;
-    rdfs:range xsd:string ;
-    rdfs:label "section name"@en ;
-    rdfs:comment "The name or title of a presentation section"@en .
 
-:sectionPurpose rdf:type owl:DatatypeProperty ;
-    rdfs:domain :PresentationSection ;
-    rdfs:range xsd:string ;
-    rdfs:label "section purpose"@en ;
-    rdfs:comment "The intended purpose or goal of a presentation section"@en .
+###  http://w3c.org/scientific-presentation-ontology#followedBy
+:followedBy rdf:type owl:ObjectProperty ;
+            rdfs:domain :PresentationSection ;
+            rdfs:range :PresentationSection ;
+            rdfs:comment "Indicates the sequential order of presentation sections"@en ;
+            rdfs:label "followed by"@en .
 
-:sequenceOrder rdf:type owl:DatatypeProperty ;
-    rdfs:domain :PresentationSection ;
-    rdfs:range xsd:integer ;
-    rdfs:label "sequence order"@en ;
-    rdfs:comment "Numerical order of section in presentation sequence"@en .
 
-:sectionLength rdf:type owl:DatatypeProperty ;
-    rdfs:domain :PresentationSection ;
-    rdfs:range xsd:string ;
-    rdfs:label "section length"@en ;
-    rdfs:comment "Relative length or duration descriptor for the section"@en .
-
-:timeAllocation rdf:type owl:DatatypeProperty ;
-    rdfs:domain :PresentationSection ;
-    rdfs:range xsd:nonNegativeInteger ;
-    rdfs:label "time allocation"@en ;
-    rdfs:comment "Time allocated for the section in minutes"@en .
-
-:textualContentAmount rdf:type owl:DatatypeProperty ;
-    rdfs:domain :PresentationSection ;
-    rdfs:range xsd:integer ;
-    rdfs:label "textual content amount"@en ;
-    rdfs:comment "Amount of textual content in section"@en .
-
-### Presentation Characteristics
-:presentationType rdf:type owl:DatatypeProperty ;
-    rdfs:domain :ScientificPresentation ;
-    rdfs:range xsd:string ;
-    rdfs:label "presentation type"@en ;
-    rdfs:comment "Type or category of scientific presentation"@en .
-
-:duration rdf:type owl:DatatypeProperty ;
-    rdfs:domain :ScientificPresentation ;
-    rdfs:range xsd:nonNegativeInteger ;
-    rdfs:label "duration"@en ;
-    rdfs:comment "Duration of the presentation in minutes"@en .
-
-### Content Properties
-:complexityLevel rdf:type owl:DatatypeProperty ;
-    rdfs:domain :ContentElement ;
-    rdfs:range xsd:integer ;
-    rdfs:label "complexity level"@en ;
-    rdfs:comment "Level of complexity for content (1-5 scale)"@en .
-
-:technicalDepth rdf:type owl:DatatypeProperty ;
-    rdfs:domain :ContentElement ;
-    rdfs:range xsd:integer ;
-    rdfs:label "technical depth"@en ;
-    rdfs:comment "Level of technical detail (1-5 scale)"@en .
-
-:isEssential rdf:type owl:DatatypeProperty ;
-    rdfs:domain :ContentElement ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "is essential"@en ;
-    rdfs:comment "Indicates whether content element is essential for understanding"@en .
-
-:accuracyScore rdf:type owl:DatatypeProperty ;
-    rdfs:domain :ContentElement ;
-    rdfs:range xsd:float ;
-    rdfs:label "accuracy score"@en ;
-    rdfs:comment "Technical accuracy rating (0.0-1.0)"@en .
-
-:grammarCorrectness rdf:type owl:DatatypeProperty ;
-    rdfs:domain :ContentElement ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "grammar correctness"@en ;
-    rdfs:comment "Whether content is grammatically correct"@en .
-
-### Quality Measurements
-:coherenceScore rdf:type owl:DatatypeProperty ;
-    rdfs:domain :ScientificPresentation ;
-    rdfs:range xsd:float ;
-    rdfs:label "coherence score"@en ;
-    rdfs:comment "Narrative coherence rating (0.0-1.0)"@en .
-
-:engagementLevel rdf:type owl:DatatypeProperty ;
-    rdfs:domain [ rdf:type owl:Class ;
-                  owl:unionOf ( :EngagementStrategy :NarrativeDevice ) ] ;
-    rdfs:range xsd:integer ;
-    rdfs:label "engagement level"@en ;
-    rdfs:comment "Effectiveness of engagement strategy or device (1-5 scale)"@en .
-
-:rigorLevel rdf:type owl:DatatypeProperty ;
-    rdfs:domain :ScientificClaim ;
-    rdfs:range xsd:integer ;
-    rdfs:label "rigor level"@en ;
-    rdfs:comment "Level of scientific rigor required (1-5 scale)"@en .
-
-:detailImportanceLevel rdf:type owl:DatatypeProperty ;
-    rdfs:domain :ScientificDetail ;
-    rdfs:range xsd:integer ;
-    rdfs:label "detail importance level"@en ;
-    rdfs:comment "Importance level of scientific detail (1-5 scale)"@en .
-
-:noveltyLevel rdf:type owl:DatatypeProperty ;
-    rdfs:domain :ScientificClaim ;
-    rdfs:range xsd:integer ;
-    rdfs:label "novelty level"@en ;
-    rdfs:comment "Level of novelty or innovation (1-5 scale)"@en .
-
-### Audience Properties
-:expertiseLevel rdf:type owl:DatatypeProperty ;
-    rdfs:domain :Audience ;
-    rdfs:range xsd:string ;
-    rdfs:label "expertise level"@en ;
-    rdfs:comment "Level of domain expertise (novice, intermediate, expert)"@en .
-
-:culturalContext rdf:type owl:DatatypeProperty ;
-    rdfs:domain :Audience ;
-    rdfs:range xsd:string ;
-    rdfs:label "cultural context"@en ;
-    rdfs:comment "Cultural background or context of audience"@en .
-
-:expectedSize rdf:type owl:DatatypeProperty ;
-    rdfs:domain :Audience ;
-    rdfs:range xsd:integer ;
-    rdfs:label "expected size"@en ;
-    rdfs:comment "Expected number of audience members"@en .
-
-:attentionSpan rdf:type owl:DatatypeProperty ;
-    rdfs:domain :Audience ;
-    rdfs:range xsd:nonNegativeInteger ;
-    rdfs:label "attention span"@en ;
-    rdfs:comment "Typical attention span of audience in minutes"@en .
-
-### Citation and Evidence Properties
-:citationFormat rdf:type owl:DatatypeProperty ;
-    rdfs:domain :Citation ;
-    rdfs:range xsd:string ;
-    rdfs:label "citation format"@en ;
-    rdfs:comment "Format style for citations (APA, MLA, etc.)"@en .
-
-:evidenceType rdf:type owl:DatatypeProperty ;
-    rdfs:domain :Evidence ;
-    rdfs:range xsd:string ;
-    rdfs:label "evidence type"@en ;
-    rdfs:comment "Type of evidence (experimental, observational, theoretical)"@en .
-
-### Narrative Properties
-:narrativeFunction rdf:type owl:DatatypeProperty ;
-    rdfs:domain :NarrativeDevice ;
-    rdfs:range xsd:string ;
-    rdfs:label "narrative function"@en ;
-    rdfs:comment "The function or purpose of the narrative device"@en .
-
-:narrativeEffectiveness rdf:type owl:DatatypeProperty ;
-    rdfs:domain :NarrativeDevice ;
-    rdfs:range xsd:float ;
-    rdfs:label "narrative effectiveness"@en ;
-    rdfs:comment "Effectiveness rating of the narrative device (0.0-1.0)"@en .
-
-#################################################################
-#    Axioms and Restrictions
-#################################################################
-
-### Simplified Requirements
-# Every scientific presentation should have an introduction
-:ScientificPresentation rdfs:subClassOf 
-    [ rdf:type owl:Restriction ;
-      owl:onProperty :hasSection ;
-      owl:someValuesFrom :Introduction ] .
-
-# Every scientific presentation should have a conclusion  
-:ScientificPresentation rdfs:subClassOf 
-    [ rdf:type owl:Restriction ;
-      owl:onProperty :hasSection ;
-      owl:someValuesFrom :Conclusion ] .
-
-# Every section should have a sequence order
-:PresentationSection rdfs:subClassOf 
-    [ rdf:type owl:Restriction ;
-      owl:onProperty :sequenceOrder ;
-      owl:someValuesFrom xsd:positiveInteger ] .
-
-### Simplified Quality Requirements  
-# High rigor scientific claims should have citations
-:ScientificClaim rdfs:subClassOf 
-    [ rdf:type owl:Restriction ;
-      owl:onProperty :requires ;
-      owl:someValuesFrom :Citation ] .
-
-# Scientific claims should be supported by evidence
-:ScientificClaim rdfs:subClassOf 
-    [ rdf:type owl:Restriction ;
-      owl:onProperty :requires ;
-      owl:someValuesFrom :Evidence ] .
-
-### Simplified Audience-Content Guidelines
-# Content for specialized audiences can be more technical
-:ContentElement rdfs:subClassOf 
-    [ rdf:type owl:Restriction ;
-      owl:onProperty :technicalDepth ;
-      owl:someValuesFrom xsd:positiveInteger ] .
-
-### Property Characteristics (simplified)
-# Remove potentially problematic property characteristics
-# :followedBy rdf:type owl:IrreflexiveProperty .
-# :hasLogicalSuccessor rdf:type owl:FunctionalProperty .
-
-#################################################################
-#    Example Individuals
-#################################################################
-
-### Example Scientific Topic
-:SemanticReasoning rdf:type :ScientificTopic ;
-    rdfs:label "Semantic Reasoning"@en ;
-    :hasRecommendedSection :IntroductionExample, :MethodsExample, :ResultsExample .
-
-### Example Presentation
-:ExampleConferencePresentation rdf:type :ConferencePresentation ;
-    :duration 20 ;
-    :presentationType "research presentation" ;
-    :targetedAt :SpecializedAudienceExample ;
-    :hasSection :IntroductionExample, :MethodsExample, :ResultsExample, :DiscussionExample, :ConclusionExample ;
-    :employs :InteractivePollExample ;
-    :coherenceScore "0.85"^^xsd:float .
-
-### Example Sections
-:IntroductionExample rdf:type :Introduction ;
-    :sectionName "Introduction" ;
-    :sectionPurpose "Set the stage for the talk" ;
-    :sequenceOrder 1 ;
-    :timeAllocation 3 ;
-    :uses :RhetoricalQuestionExample ;
-    :contains :HookExample, :ProblemStatementExample ;
-    :hasLogicalSuccessor :MethodsExample .
-
-:MethodsExample rdf:type :Methods ;
-    :sectionName "Methods" ;
-    :sectionPurpose "Explain technical approach" ;
-    :sequenceOrder 2 ;
-    :timeAllocation 5 ;
-    :complexityLevel 4 ;
-    :contains :MethodologyExample ;
-    :hasLogicalPredecessor :IntroductionExample ;
-    :hasLogicalSuccessor :ResultsExample .
-
-:ResultsExample rdf:type :Results ;
-    :sectionName "Results" ;
-    :sectionPurpose "Present research findings" ;
-    :sequenceOrder 3 ;
-    :timeAllocation 7 ;
-    :contains :DataVisualizationExample, :MainFindingClaim ;
-    :hasLogicalPredecessor :MethodsExample ;
-    :hasLogicalSuccessor :DiscussionExample .
-
-:DiscussionExample rdf:type :Discussion ;
-    :sectionName "Discussion" ;
-    :sectionPurpose "Interpret and contextualize results" ;
-    :sequenceOrder 4 ;
-    :timeAllocation 3 ;
-    :contains :LimitationExample ;
-    :hasLogicalPredecessor :ResultsExample ;
-    :hasLogicalSuccessor :ConclusionExample .
-
-:ConclusionExample rdf:type :Conclusion ;
-    :sectionName "Conclusion" ;
-    :sectionPurpose "Summarize key findings and implications" ;
-    :sequenceOrder 5 ;
-    :timeAllocation 2 ;
-    :contains :TakeawayMessageExample ;
-    :hasLogicalPredecessor :DiscussionExample .
-
-### Example Audience
-:SpecializedAudienceExample rdf:type :SpecializedAudience ;
-    :expertiseLevel "expert" ;
-    :expectedSize 50 ;
-    :culturalContext "academic" ;
-    :attentionSpan 45 .
-
-:GeneralAudienceExample rdf:type :GeneralAudience ;
-    :expertiseLevel "novice" ;
-    :expectedSize 100 ;
-    :culturalContext "public" ;
-    :attentionSpan 20 .
-
-### Example Content Elements
-:MainFindingClaim rdf:type :ScientificClaim ;
-    :rigorLevel 5 ;
-    :noveltyLevel 4 ;
-    :requires :PrimarySourceCitation ;
-    :technicalDepth 4 ;
-    :isEssential true ;
-    :adaptedFor :SpecializedAudienceExample .
-
-:PrimarySourceCitation rdf:type :Citation ;
-    :citationFormat "APA" .
-
-:ExperimentalEvidence rdf:type :Evidence ;
-    :evidenceType "experimental" ;
-    :supports :MainFindingClaim ;
-    :accuracyScore 0.95 .
-
-:HookExample rdf:type :Hook ;
-    :technicalDepth 1 ;
-    :adaptedFor :SpecializedAudienceExample ;
-    :isEssential true .
-
-:ProblemStatementExample rdf:type :ContentElement ;
-    :technicalDepth 2 ;
-    :complexityLevel 2 ;
-    :isEssential true .
-
-:MethodologyExample rdf:type :Methodology ;
-    :complexityLevel 4 ;
-    :technicalDepth 4 ;
-    :accuracyScore 0.95 ;
-    :isEssential true .
-
-:DataVisualizationExample rdf:type :DataVisualization ;
-    :technicalDepth 3 ;
-    :accuracyScore 0.98 ;
-    :complexityLevel 3 .
-
-:LimitationExample rdf:type :Limitation ;
-    :technicalDepth 3 ;
-    :isEssential false .
-
-:TakeawayMessageExample rdf:type :TakeawayMessage ;
-    :technicalDepth 2 ;
-    :isEssential true ;
-    :adaptedFor :SpecializedAudienceExample .
-
-:ScientificDetailExample rdf:type :ScientificDetail ;
-    :detailImportanceLevel 4 ;
-    :isRelevantFor :SpecializedAudienceExample ;
-    :technicalDepth 5 .
-
-### Example Narrative Devices
-:RhetoricalQuestionExample rdf:type :RhetoricalQuestion ;
-    :appropriateFor :SpecializedAudienceExample ;
-    :engagementLevel 3 ;
-    :narrativeFunction "engage audience attention" ;
-    :narrativeEffectiveness 0.75 ;
-    :appliesTo :IntroductionExample .
-
-:AnalogyExample rdf:type :Analogy ;
-    :appropriateFor :GeneralAudienceExample ;
-    :engagementLevel 4 ;
-    :narrativeFunction "simplify complex concepts" ;
-    :narrativeEffectiveness 0.85 .
-
-:RealWorldExampleInstance rdf:type :RealWorldExample ;
-    :appropriateFor :MixedAudienceExample ;
-    :engagementLevel 4 ;
-    :narrativeFunction "contextualize research" ;
-    :narrativeEffectiveness 0.80 .
-
-### Example Engagement Strategies
-:InteractivePollExample rdf:type :InteractivePoll ;
-    :effectiveFor :SpecializedAudienceExample ;
-    :engagementLevel 4 .
-
-:ThoughtExperimentExample rdf:type :ThoughtExperiment ;
-    :effectiveFor :InterdisciplinaryAudienceExample ;
-    :engagementLevel 5 .
-
-:CallToActionExample rdf:type :CallToAction ;
-    :effectiveFor :GeneralAudienceExample ;
-    :engagementLevel 3 .
-
-### Example Quality Metrics
-:RigorMetricExample rdf:type :ScientificRigor ;
-    rdfs:label "Scientific Rigor Assessment" .
-
-:EngagementMetricExample rdf:type :AudienceEngagement ;
-    rdfs:label "Audience Engagement Assessment" .
-
-:CoherenceMetricExample rdf:type :NarrativeCoherence ;
-    rdfs:label "Narrative Coherence Assessment" .
-
-### Additional Audience Examples
-:MixedAudienceExample rdf:type :MixedExpertiseAudience ;
-    :expertiseLevel "mixed" ;
-    :expectedSize 75 ;
-    :culturalContext "industry-academic" ;
-    :attentionSpan 30 .
-
-:InterdisciplinaryAudienceExample rdf:type :InterdisciplinaryAudience ;
-    :expertiseLevel "intermediate" ;
-    :expectedSize 60 ;
-    :culturalContext "cross-disciplinary" ;
-    :attentionSpan 35 .
-
-### Content Adaptation Examples
-:SimplifiedMethodology rdf:type :Methodology ;
-    :complexityLevel 2 ;
-    :technicalDepth 2 ;
-    :adaptedFor :GeneralAudienceExample ;
-    :isEssential true .
-
-# Relationship showing content simplification
-:MethodologyExample :simplifyContentItem :SimplifiedMethodology .
-
-:OptionalTechnicalDetail rdf:type :ScientificDetail ;
-    :detailImportanceLevel 2 ;
-    :technicalDepth 5 ;
-    :isEssential false .
-
-# Relationship showing content omission for certain audiences (fixed)
-:OptionalTechnicalDetail :isEssential false .
-
-#################################################################
-#    Additional Semantic Rules and Inferences
-#################################################################
-
-### Basic Property Relationships
+###  http://w3c.org/scientific-presentation-ontology#hasLogicalPredecessor
 :hasLogicalPredecessor rdf:type owl:ObjectProperty ;
-    rdfs:domain :PresentationSection ;
-    rdfs:range :PresentationSection ;
-    rdfs:label "has logical predecessor" ;
-    rdfs:comment "Indicates the logical previous section in presentation flow" .
+                       owl:inverseOf :hasLogicalSuccessor ;
+                       rdfs:domain :PresentationSection ;
+                       rdfs:range :PresentationSection ;
+                       rdfs:comment "Indicates the logical previous section in presentation flow" ,
+                                    "Indicates the logical previous section in presentation flow"@en ;
+                       rdfs:label "has logical predecessor" ,
+                                  "has logical predecessor"@en .
 
-### Property Chains (basic)
+
+###  http://w3c.org/scientific-presentation-ontology#hasLogicalSuccessor
+:hasLogicalSuccessor rdf:type owl:ObjectProperty ;
+                     rdfs:subPropertyOf :followedBy ;
+                     rdfs:comment "Indicates the logical next section in presentation flow"@en ;
+                     rdfs:label "has logical successor"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#hasPresenter
+:hasPresenter rdf:type owl:ObjectProperty ;
+              rdfs:domain :ScientificPresentation ;
+              rdfs:range :Presenter ;
+              rdfs:comment "The person or entity delivering the scientific presentation" ;
+              rdfs:label "presenter" .
+
+
+###  http://w3c.org/scientific-presentation-ontology#hasRecommendedSection
+:hasRecommendedSection rdf:type owl:ObjectProperty ;
+                       rdfs:subPropertyOf :hasSection ;
+                       rdfs:domain :ScientificTopic ;
+                       rdfs:range :PresentationSection ;
+                       rdfs:comment "Indicates recommended sections for specific scientific topics"@en ;
+                       rdfs:label "has recommended section"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#hasSection
+:hasSection rdf:type owl:ObjectProperty ;
+            rdfs:domain :ScientificPresentation ;
+            rdfs:range :PresentationSection ;
+            rdfs:comment "Indicates that a presentation contains a specific section"@en ;
+            rdfs:label "has section"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#indirectlyContains
 :indirectlyContains rdf:type owl:ObjectProperty ;
-    rdfs:domain :ScientificPresentation ;
-    rdfs:range :ContentElement ;
-    rdfs:label "indirectly contains" ;
-    rdfs:comment "Indicates content elements contained within presentation sections" .
+                    rdfs:domain :ScientificPresentation ;
+                    rdfs:range :ContentElement ;
+                    rdfs:comment "Indicates content elements contained within presentation sections" ;
+                    rdfs:label "indirectly contains" .
 
-### Basic Class Relationships  
-# Simple subclass relationships without disjointness
-:SpecializedAudience rdfs:subClassOf :Audience .
-:GeneralAudience rdfs:subClassOf :Audience .
 
-### Simplified Class Definitions
-# Specialized audiences are those with expert-level expertise
-:SpecializedAudience rdfs:subClassOf :Audience .
+###  http://w3c.org/scientific-presentation-ontology#isRelevantFor
+:isRelevantFor rdf:type owl:ObjectProperty ;
+               rdfs:domain :ScientificDetail ;
+               rdfs:range :Audience ;
+               rdfs:comment "Indicates relevance of scientific details for specific audiences"@en ;
+               rdfs:label "is relevant for"@en .
 
-### Simplified Data Type Constraints
-# Basic range constraints without complex restrictions
-:sequenceOrder rdfs:range xsd:positiveInteger .
-:engagementLevel rdfs:range xsd:positiveInteger .
-:technicalDepth rdfs:range xsd:positiveInteger .
-:complexityLevel rdfs:range xsd:positiveInteger .
-:rigorLevel rdfs:range xsd:positiveInteger .
-:coherenceScore rdfs:range xsd:float .
-:accuracyScore rdfs:range xsd:float .
-:narrativeEffectiveness rdfs:range xsd:float .
+
+###  http://w3c.org/scientific-presentation-ontology#omitContentItem
+:omitContentItem rdf:type owl:ObjectProperty ;
+                 rdfs:domain :ContentElement ;
+                 rdfs:range :ContentElement ;
+                 rdfs:comment "Indicates content that should be omitted for certain contexts"@en ;
+                 rdfs:label "omit content item"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#requires
+:requires rdf:type owl:ObjectProperty ;
+          rdfs:domain :ScientificClaim ;
+          rdfs:range :Citation ;
+          rdfs:comment "Indicates that a claim requires citation support"@en ;
+          rdfs:label "requires"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#simplifyContentItem
+:simplifyContentItem rdf:type owl:ObjectProperty ;
+                     rdfs:domain :ContentElement ;
+                     rdfs:range :ContentElement ;
+                     rdfs:comment "Indicates a simplified version of content for different audiences"@en ;
+                     rdfs:label "simplify content item"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#supports
+:supports rdf:type owl:ObjectProperty ;
+          rdfs:domain :Evidence ;
+          rdfs:range :ScientificClaim ;
+          rdfs:comment "Indicates that evidence supports a scientific claim"@en ;
+          rdfs:label "supports"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#targetedAt
+:targetedAt rdf:type owl:ObjectProperty ;
+            rdfs:domain :ScientificPresentation ;
+            rdfs:range :Audience ;
+            rdfs:comment "Indicates the intended audience for a presentation"@en ;
+            rdfs:label "targeted at"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#uses
+:uses rdf:type owl:ObjectProperty ;
+      rdfs:domain :PresentationSection ;
+      rdfs:range :NarrativeDevice ;
+      rdfs:comment "Indicates use of narrative devices in presentation sections"@en ;
+      rdfs:label "uses"@en .
+
 
 #################################################################
-#    End of Ontology
+#    Data properties
 #################################################################
+
+###  http://w3c.org/scientific-presentation-ontology#accuracyScore
+:accuracyScore rdf:type owl:DatatypeProperty ;
+               rdfs:domain :ContentElement ;
+               rdfs:range xsd:float ;
+               rdfs:comment "Technical accuracy rating (0.0-1.0)"@en ;
+               rdfs:label "accuracy score"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#attentionSpan
+:attentionSpan rdf:type owl:DatatypeProperty ;
+               rdfs:domain :Audience ;
+               rdfs:range xsd:nonNegativeInteger ;
+               rdfs:comment "Typical attention span of audience in minutes"@en ;
+               rdfs:label "attention span"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#citationFormat
+:citationFormat rdf:type owl:DatatypeProperty ;
+                rdfs:domain :Citation ;
+                rdfs:range xsd:string ;
+                rdfs:comment "Format style for citations (APA, MLA, etc.)"@en ;
+                rdfs:label "citation format"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#coherenceScore
+:coherenceScore rdf:type owl:DatatypeProperty ;
+                rdfs:domain :ScientificPresentation ;
+                rdfs:range xsd:float ;
+                rdfs:comment "Narrative coherence rating (0.0-1.0)"@en ;
+                rdfs:label "coherence score"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#complexityLevel
+:complexityLevel rdf:type owl:DatatypeProperty ;
+                 rdfs:domain :ContentElement ;
+                 rdfs:range xsd:integer ,
+                            xsd:positiveInteger ;
+                 rdfs:comment "Level of complexity for content (1-5 scale)"@en ;
+                 rdfs:label "complexity level"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#culturalContext
+:culturalContext rdf:type owl:DatatypeProperty ;
+                 rdfs:domain :Audience ;
+                 rdfs:range xsd:string ;
+                 rdfs:comment "Cultural background or context of audience"@en ;
+                 rdfs:label "cultural context"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#detailImportanceLevel
+:detailImportanceLevel rdf:type owl:DatatypeProperty ;
+                       rdfs:domain :ScientificDetail ;
+                       rdfs:range xsd:integer ;
+                       rdfs:comment "Importance level of scientific detail (1-5 scale)"@en ;
+                       rdfs:label "detail importance level"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#duration
+:duration rdf:type owl:DatatypeProperty ;
+          rdfs:domain :ScientificPresentation ;
+          rdfs:range xsd:nonNegativeInteger ;
+          rdfs:comment "Duration of the presentation in minutes"@en ;
+          rdfs:label "duration"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#engagementLevel
+:engagementLevel rdf:type owl:DatatypeProperty ;
+                 rdfs:domain [ rdf:type owl:Class ;
+                               owl:unionOf ( :EngagementStrategy
+                                             :NarrativeDevice
+                                           )
+                             ] ;
+                 rdfs:range xsd:integer ,
+                            xsd:positiveInteger ;
+                 rdfs:comment "Effectiveness of engagement strategy or device (1-5 scale)"@en ;
+                 rdfs:label "engagement level"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#evidenceType
+:evidenceType rdf:type owl:DatatypeProperty ;
+              rdfs:domain :Evidence ;
+              rdfs:range xsd:string ;
+              rdfs:comment "Type of evidence (experimental, observational, theoretical)"@en ;
+              rdfs:label "evidence type"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#expectedSize
+:expectedSize rdf:type owl:DatatypeProperty ;
+              rdfs:domain :Audience ;
+              rdfs:range xsd:integer ;
+              rdfs:comment "Expected number of audience members"@en ;
+              rdfs:label "expected size"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#expertiseLevel
+:expertiseLevel rdf:type owl:DatatypeProperty ;
+                rdfs:domain :Audience ;
+                rdfs:range xsd:string ;
+                rdfs:comment "Level of domain expertise (novice, intermediate, expert)"@en ;
+                rdfs:label "expertise level"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#grammarCorrectness
+:grammarCorrectness rdf:type owl:DatatypeProperty ;
+                    rdfs:domain :ContentElement ;
+                    rdfs:range xsd:boolean ;
+                    rdfs:comment "Whether content is grammatically correct"@en ;
+                    rdfs:label "grammar correctness"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#isEssential
+:isEssential rdf:type owl:DatatypeProperty ;
+             rdfs:domain :ContentElement ;
+             rdfs:range xsd:boolean ;
+             rdfs:comment "Indicates whether content element is essential for understanding"@en ;
+             rdfs:label "is essential"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#narrativeEffectiveness
+:narrativeEffectiveness rdf:type owl:DatatypeProperty ;
+                        rdfs:domain :NarrativeDevice ;
+                        rdfs:range xsd:float ;
+                        rdfs:comment "Effectiveness rating of the narrative device (0.0-1.0)"@en ;
+                        rdfs:label "narrative effectiveness"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#narrativeFunction
+:narrativeFunction rdf:type owl:DatatypeProperty ;
+                   rdfs:domain :NarrativeDevice ;
+                   rdfs:range xsd:string ;
+                   rdfs:comment "The function or purpose of the narrative device"@en ;
+                   rdfs:label "narrative function"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#noveltyLevel
+:noveltyLevel rdf:type owl:DatatypeProperty ;
+              rdfs:domain :ScientificClaim ;
+              rdfs:range xsd:integer ;
+              rdfs:comment "Level of novelty or innovation (1-5 scale)"@en ;
+              rdfs:label "novelty level"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#presentationType
+:presentationType rdf:type owl:DatatypeProperty ;
+                  rdfs:domain :ScientificPresentation ;
+                  rdfs:range xsd:string ;
+                  rdfs:comment "Type or category of scientific presentation"@en ;
+                  rdfs:label "presentation type"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#rigorLevel
+:rigorLevel rdf:type owl:DatatypeProperty ;
+            rdfs:domain :ScientificClaim ;
+            rdfs:range xsd:integer ,
+                       xsd:positiveInteger ;
+            rdfs:comment "Level of scientific rigor required (1-5 scale)"@en ;
+            rdfs:label "rigor level"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#sectionLength
+:sectionLength rdf:type owl:DatatypeProperty ;
+               rdfs:domain :PresentationSection ;
+               rdfs:range xsd:string ;
+               rdfs:comment "Relative length or duration descriptor for the section"@en ;
+               rdfs:label "section length"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#sectionName
+:sectionName rdf:type owl:DatatypeProperty ;
+             rdfs:domain :PresentationSection ;
+             rdfs:range xsd:string ;
+             rdfs:comment "The name or title of a presentation section"@en ;
+             rdfs:label "section name"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#sectionPurpose
+:sectionPurpose rdf:type owl:DatatypeProperty ;
+                rdfs:domain :PresentationSection ;
+                rdfs:range xsd:string ;
+                rdfs:comment "The intended purpose or goal of a presentation section"@en ;
+                rdfs:label "section purpose"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#sequenceOrder
+:sequenceOrder rdf:type owl:DatatypeProperty ;
+               rdfs:domain :PresentationSection ;
+               rdfs:range xsd:integer ,
+                          xsd:positiveInteger ;
+               rdfs:comment "Numerical order of section in presentation sequence"@en ;
+               rdfs:label "sequence order"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#technicalDepth
+:technicalDepth rdf:type owl:DatatypeProperty ;
+                rdfs:domain :ContentElement ;
+                rdfs:range xsd:integer ,
+                           xsd:positiveInteger ;
+                rdfs:comment "Level of technical detail (1-5 scale)"@en ;
+                rdfs:label "technical depth"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#textualContentAmount
+:textualContentAmount rdf:type owl:DatatypeProperty ;
+                      rdfs:domain :PresentationSection ;
+                      rdfs:range xsd:integer ;
+                      rdfs:comment "Amount of textual content in section"@en ;
+                      rdfs:label "textual content amount"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#timeAllocation
+:timeAllocation rdf:type owl:DatatypeProperty ;
+                rdfs:domain :PresentationSection ;
+                rdfs:range xsd:nonNegativeInteger ;
+                rdfs:comment "Time allocated for the section in minutes"@en ;
+                rdfs:label "time allocation"@en .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://w3c.org/scientific-presentation-ontology#Analogy
+:Analogy rdf:type owl:Class ;
+         rdfs:subClassOf :NarrativeDevice ;
+         rdfs:comment "Comparison to familiar concepts for explanation"@en ;
+         rdfs:label "Analogy"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#Audience
+:Audience rdf:type owl:Class ;
+          rdfs:comment "The target audience for a scientific presentation"@en ;
+          rdfs:label "Audience"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#AudienceEngagement
+:AudienceEngagement rdf:type owl:Class ;
+                    rdfs:subClassOf :QualityMetric ;
+                    rdfs:comment "Measure of audience attention and interaction"@en ;
+                    rdfs:label "Audience Engagement"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#BackgroundInformation
+:BackgroundInformation rdf:type owl:Class ;
+                       rdfs:subClassOf :ContentElement ;
+                       rdfs:comment "Contextual information necessary for understanding"@en ;
+                       rdfs:label "Background Information"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#CallToAction
+:CallToAction rdf:type owl:Class ;
+              rdfs:subClassOf :EngagementStrategy ;
+              rdfs:comment "Request for audience to take specific action"@en ;
+              rdfs:label "Call to Action"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#Citation
+:Citation rdf:type owl:Class ;
+          rdfs:subClassOf :ContentElement ;
+          rdfs:comment "Reference to external sources or prior work"@en ;
+          rdfs:label "Citation"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#Conclusion
+:Conclusion rdf:type owl:Class ;
+            rdfs:subClassOf :PresentationSection ;
+            rdfs:comment "Final section summarizing key findings and takeaways"@en ;
+            rdfs:label "Conclusion"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#ConferencePresentation
+:ConferencePresentation rdf:type owl:Class ;
+                        rdfs:subClassOf :ScientificPresentation ;
+                        rdfs:comment "A presentation given at a scientific conference"@en ;
+                        rdfs:label "Conference Presentation"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#ContentElement
+:ContentElement rdf:type owl:Class ;
+                rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                  owl:onProperty :technicalDepth ;
+                                  owl:someValuesFrom xsd:positiveInteger
+                                ] ;
+                rdfs:comment "A specific piece of content within a presentation"@en ;
+                rdfs:label "Content Element"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#DataVisualization
+:DataVisualization rdf:type owl:Class ;
+                   rdfs:subClassOf :ContentElement ;
+                   rdfs:comment "Visual representation of data or results"@en ;
+                   rdfs:label "Data Visualization"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#Discussion
+:Discussion rdf:type owl:Class ;
+            rdfs:subClassOf :PresentationSection ;
+            rdfs:comment "Section interpreting results and their implications"@en ;
+            rdfs:label "Discussion"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#EngagementStrategy
+:EngagementStrategy rdf:type owl:Class ;
+                    rdfs:comment "A method for engaging and interacting with the audience"@en ;
+                    rdfs:label "Engagement Strategy"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#Evidence
+:Evidence rdf:type owl:Class ;
+          rdfs:subClassOf :ContentElement ;
+          rdfs:comment "Supporting data or information for scientific claims"@en ;
+          rdfs:label "Evidence"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#FutureWork
+:FutureWork rdf:type owl:Class ;
+            rdfs:subClassOf :PresentationSection ;
+            rdfs:comment "Section outlining planned or potential future research"@en ;
+            rdfs:label "Future Work"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#GeneralAudience
+:GeneralAudience rdf:type owl:Class ;
+                 rdfs:subClassOf :Audience ;
+                 rdfs:comment "Non-specialist audience with limited domain knowledge"@en ;
+                 rdfs:label "General Audience"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#Hook
+:Hook rdf:type owl:Class ;
+      rdfs:subClassOf :ContentElement ;
+      rdfs:comment "Attention-grabbing opening element"@en ;
+      rdfs:label "Hook"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#Humor
+:Humor rdf:type owl:Class ;
+       rdfs:subClassOf :NarrativeDevice ;
+       rdfs:comment "Appropriate use of humor for engagement"@en ;
+       rdfs:label "Humor"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#InteractivePoll
+:InteractivePoll rdf:type owl:Class ;
+                 rdfs:subClassOf :EngagementStrategy ;
+                 rdfs:comment "Live polling of audience responses"@en ;
+                 rdfs:label "Interactive Poll"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#InterdisciplinaryAudience
+:InterdisciplinaryAudience rdf:type owl:Class ;
+                           rdfs:subClassOf :Audience ;
+                           rdfs:comment "Audience with diverse disciplinary backgrounds"@en ;
+                           rdfs:label "Interdisciplinary Audience"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#Introduction
+:Introduction rdf:type owl:Class ;
+              rdfs:subClassOf :PresentationSection ;
+              rdfs:comment "Opening section that introduces the topic and context"@en ;
+              rdfs:label "Introduction"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#KeynotePresentation
+:KeynotePresentation rdf:type owl:Class ;
+                     rdfs:subClassOf :ScientificPresentation ;
+                     rdfs:comment "A main or featured presentation at a conference or event"@en ;
+                     rdfs:label "Keynote Presentation"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#Limitation
+:Limitation rdf:type owl:Class ;
+            rdfs:subClassOf :ContentElement ;
+            rdfs:comment "Acknowledgment of research constraints or weaknesses"@en ;
+            rdfs:label "Limitation"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#LinguisticQuality
+:LinguisticQuality rdf:type owl:Class ;
+                   rdfs:subClassOf :QualityMetric ;
+                   rdfs:comment "Measure of language clarity and grammatical correctness"@en ;
+                   rdfs:label "Linguistic Quality"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#LiteratureReview
+:LiteratureReview rdf:type owl:Class ;
+                  rdfs:subClassOf :PresentationSection ;
+                  rdfs:comment "Section reviewing relevant prior research and literature"@en ;
+                  rdfs:label "Literature Review"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#LiveDemonstration
+:LiveDemonstration rdf:type owl:Class ;
+                   rdfs:subClassOf :EngagementStrategy ;
+                   rdfs:comment "Real-time demonstration of concepts or methods"@en ;
+                   rdfs:label "Live Demonstration"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#Methodology
+:Methodology rdf:type owl:Class ;
+             rdfs:subClassOf :ContentElement ;
+             rdfs:comment "Description of research methods and procedures"@en ;
+             rdfs:label "Methodology"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#Methods
+:Methods rdf:type owl:Class ;
+         rdfs:subClassOf :PresentationSection ;
+         rdfs:comment "Section describing research methodology and approach"@en ;
+         rdfs:label "Methods"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#MixedExpertiseAudience
+:MixedExpertiseAudience rdf:type owl:Class ;
+                        rdfs:subClassOf :Audience ;
+                        rdfs:comment "Audience with varying levels of domain expertise"@en ;
+                        rdfs:label "Mixed Expertise Audience"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#NarrativeCoherence
+:NarrativeCoherence rdf:type owl:Class ;
+                    rdfs:subClassOf :QualityMetric ;
+                    rdfs:comment "Measure of logical flow and storytelling effectiveness"@en ;
+                    rdfs:label "Narrative Coherence"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#NarrativeDevice
+:NarrativeDevice rdf:type owl:Class ;
+                 rdfs:comment "A technique used to enhance storytelling and coherence"@en ;
+                 rdfs:label "Narrative Device"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#PresentationPurpose
+:PresentationPurpose rdf:type owl:Class ;
+                     rdfs:comment "The intended goal or objective of a presentation"@en ;
+                     rdfs:label "Presentation Purpose"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#PresentationSection
+:PresentationSection rdf:type owl:Class ;
+                     rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                       owl:onProperty :sequenceOrder ;
+                                       owl:someValuesFrom xsd:positiveInteger
+                                     ] ;
+                     rdfs:comment "A distinct section or component of a scientific presentation"@en ;
+                     rdfs:label "Presentation Section"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#Presenter
+:Presenter rdf:type owl:Class ;
+           rdfs:comment "Person or entity delivering a scientific presentation" ;
+           rdfs:label "Presenter" .
+
+
+###  http://w3c.org/scientific-presentation-ontology#ProblemStatement
+:ProblemStatement rdf:type owl:Class ;
+                  rdfs:subClassOf :PresentationSection ;
+                  rdfs:comment "Section defining the research problem or question"@en ;
+                  rdfs:label "Problem Statement"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#QualityMetric
+:QualityMetric rdf:type owl:Class ;
+               rdfs:comment "A measure of presentation quality or effectiveness"@en ;
+               rdfs:label "Quality Metric"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#QuestionAndAnswer
+:QuestionAndAnswer rdf:type owl:Class ;
+                   rdfs:subClassOf :EngagementStrategy ;
+                   rdfs:comment "Interactive Q&A session with audience"@en ;
+                   rdfs:label "Question and Answer"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#RealWorldExample
+:RealWorldExample rdf:type owl:Class ;
+                  rdfs:subClassOf :NarrativeDevice ;
+                  rdfs:comment "Concrete example from everyday experience"@en ;
+                  rdfs:label "Real World Example"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#Results
+:Results rdf:type owl:Class ;
+         rdfs:subClassOf :PresentationSection ;
+         rdfs:comment "Section presenting research findings and data"@en ;
+         rdfs:label "Results"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#RhetoricalQuestion
+:RhetoricalQuestion rdf:type owl:Class ;
+                    rdfs:subClassOf :NarrativeDevice ;
+                    rdfs:comment "Question posed for effect rather than answer"@en ;
+                    rdfs:label "Rhetorical Question"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#Roadmap
+:Roadmap rdf:type owl:Class ;
+         rdfs:subClassOf :PresentationSection ;
+         rdfs:comment "Section providing overview of presentation structure"@en ;
+         rdfs:label "Roadmap"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#ScientificClaim
+:ScientificClaim rdf:type owl:Class ;
+                 rdfs:subClassOf :ContentElement ,
+                                 [ rdf:type owl:Restriction ;
+                                   owl:onProperty :requires ;
+                                   owl:someValuesFrom :Citation
+                                 ] ,
+                                 [ rdf:type owl:Restriction ;
+                                   owl:onProperty :requires ;
+                                   owl:someValuesFrom :Evidence
+                                 ] ;
+                 rdfs:comment "A statement or assertion based on scientific evidence"@en ;
+                 rdfs:label "Scientific Claim"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#ScientificDetail
+:ScientificDetail rdf:type owl:Class ;
+                  rdfs:subClassOf :ContentElement ;
+                  rdfs:comment "Specific technical or scientific information element"@en ;
+                  rdfs:label "Scientific Detail"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#ScientificPresentation
+:ScientificPresentation rdf:type owl:Class ;
+                        rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                          owl:onProperty :hasSection ;
+                                          owl:someValuesFrom :Conclusion
+                                        ] ,
+                                        [ rdf:type owl:Restriction ;
+                                          owl:onProperty :hasSection ;
+                                          owl:someValuesFrom :Introduction
+                                        ] ;
+                        rdfs:comment "A formal presentation of scientific research or findings"@en ;
+                        rdfs:label "Scientific Presentation"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#ScientificRigor
+:ScientificRigor rdf:type owl:Class ;
+                 rdfs:subClassOf :QualityMetric ;
+                 rdfs:comment "Measure of methodological soundness and accuracy"@en ;
+                 rdfs:label "Scientific Rigor"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#ScientificTopic
+:ScientificTopic rdf:type owl:Class ;
+                 rdfs:comment "A specific scientific domain or research area addressed in the presentation"@en ;
+                 rdfs:label "Scientific Topic"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#SpecializedAudience
+:SpecializedAudience rdf:type owl:Class ;
+                     rdfs:subClassOf :Audience ;
+                     rdfs:comment "Audience with deep expertise in the presentation domain"@en ;
+                     rdfs:label "Specialized Audience"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#StorytellingTechnique
+:StorytellingTechnique rdf:type owl:Class ;
+                       rdfs:subClassOf :NarrativeDevice ;
+                       rdfs:comment "Narrative method to engage audience"@en ;
+                       rdfs:label "Storytelling Technique"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#TakeawayMessage
+:TakeawayMessage rdf:type owl:Class ;
+                 rdfs:subClassOf :ContentElement ;
+                 rdfs:comment "Key message or finding the audience should remember"@en ;
+                 rdfs:label "Takeaway Message"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#TechnicalAccuracy
+:TechnicalAccuracy rdf:type owl:Class ;
+                   rdfs:subClassOf :QualityMetric ;
+                   rdfs:comment "Measure of correctness of technical content"@en ;
+                   rdfs:label "Technical Accuracy"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#ThoughtExperiment
+:ThoughtExperiment rdf:type owl:Class ;
+                   rdfs:subClassOf :EngagementStrategy ;
+                   rdfs:comment "Hypothetical scenario for audience consideration"@en ;
+                   rdfs:label "Thought Experiment"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#Transition
+:Transition rdf:type owl:Class ;
+            rdfs:subClassOf :ContentElement ;
+            rdfs:comment "Element connecting different sections or topics"@en ;
+            rdfs:label "Transition"@en .
+
+
+###  http://w3c.org/scientific-presentation-ontology#WorkshopPresentation
+:WorkshopPresentation rdf:type owl:Class ;
+                      rdfs:subClassOf :ScientificPresentation ;
+                      rdfs:comment "A presentation given in a workshop or training session"@en ;
+                      rdfs:label "Workshop Presentation"@en .
+
+
+###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi
