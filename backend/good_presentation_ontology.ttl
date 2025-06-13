@@ -1,0 +1,95 @@
+@prefix ex: <http://example.org/presentation#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# Classi
+ex:PresentationSection a rdfs:Class .
+ex:ScientificTopic a rdfs:Class .
+ex:ContentItem a rdfs:Class .
+ex:AudienceType a rdfs:Class .
+ex:PresentationPurpose a rdfs:Class .
+ex:NarrativeDevice a rdfs:Class .
+ex:TargetAudience a rdfs:Class .
+ex:ScientificDetail a rdfs:Class .
+ex:PresentationType a rdfs:Class .
+
+# Proprietà
+ex:hasRecommendedSection a rdf:Property ;
+    rdfs:domain ex:ScientificTopic ;
+    rdfs:range ex:PresentationSection .
+
+ex:SectionName a rdf:Property ;
+    rdfs:domain ex:PresentationSection ;
+    rdfs:range rdfs:Literal .
+
+ex:SectionPurpose a rdf:Property ;
+    rdfs:domain ex:PresentationSection ;
+    rdfs:range rdfs:Literal .
+
+ex:sectionOrder a rdf:Property ;
+    rdfs:domain ex:PresentationSection ;
+    rdfs:range rdfs:Literal .
+
+ex:sectionLength a rdf:Property ;
+    rdfs:domain ex:PresentationSection ;
+    rdfs:range rdfs:Literal .
+
+ex:hasLogicalPredecessor a rdf:Property ;
+    rdfs:domain ex:PresentationSection ;
+    rdfs:range ex:PresentationSection .
+
+ex:hasLogicalSuccessor a rdf:Property ;
+    rdfs:domain ex:PresentationSection ;
+    rdfs:range ex:PresentationSection .
+
+ex:simplifyContentItem a rdf:Property ;
+    rdfs:domain ex:ContentItem ;
+    rdfs:range rdfs:Literal .
+
+ex:omitContentItem a rdf:Property ;
+    rdfs:domain ex:ContentItem ;
+    rdfs:range rdfs:Literal .
+
+ex:complexityLevel a rdf:Property ;
+    rdfs:domain ex:ContentItem ;
+    rdfs:range rdfs:Literal .
+
+ex:isEssential a rdf:Property ;
+    rdfs:domain ex:ContentItem ;
+    rdfs:range rdfs:Literal .
+
+ex:AppliesToSection a rdf:Property ;
+    rdfs:domain ex:NarrativeDevice ;
+    rdfs:range ex:PresentationSection .
+
+ex:NarrativeFunction a rdf:Property ;
+    rdfs:domain ex:NarrativeDevice ;
+    rdfs:range rdfs:Literal .
+
+ex:NarrativeEffectiveness a rdf:Property ;
+    rdfs:domain ex:NarrativeDevice ;
+    rdfs:range rdfs:Literal .
+
+ex:isRelevantFor a rdf:Property ;
+    rdfs:domain ex:ScientificDetail ;
+    rdfs:range ex:AudienceType .
+
+ex:detailImportanceLevel a rdf:Property ;
+    rdfs:domain ex:ScientificDetail ;
+    rdfs:range rdfs:Literal .
+
+# Esempi istanze
+ex:SemanticReasoning a ex:ScientificTopic ;
+    ex:hasRecommendedSection ex:Introduction, ex:Methods .
+
+ex:Introduction a ex:PresentationSection ;
+    ex:SectionName "Introduction" ;
+    ex:SectionPurpose "Set the stage for the talk" ;
+    ex:sectionOrder 1 ;
+    ex:hasLogicalSuccessor ex:Methods .
+
+ex:Methods a ex:PresentationSection ;
+    ex:SectionName "Methods" ;
+    ex:SectionPurpose "Explain technical approach" ;
+    ex:sectionOrder 2 ;
+    ex:hasLogicalPredecessor ex:Introduction .

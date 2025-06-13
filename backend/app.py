@@ -9,11 +9,10 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import json
 import logging
+import re  # For regular expressions to extract topic from query
 
-# Load environment variables from .env file
 load_dotenv()
 
-# --- Logging Configuration ---
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -26,7 +25,6 @@ formatter = logging.Formatter(
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
-# --- Configuration ---
 app = Flask(__name__)
 CORS(app)
 
@@ -37,24 +35,31 @@ if not GEMINI_API_KEY:
     exit(1)
 
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-2.0-flash')
+llm_model = genai.GenerativeModel('gemini-2.0-flash')
 
-# --- Knowledge Graph Loading ---
 kg_graph = Graph()
-KG_FILE_PATH = 'knowledge_graph.ttl'
+KG_FILE_PATH = 'presentation_data.ttl'  # This file will now be initially empty
+ONTOLOGY_FILE_PATH = 'good_presentation_ontology.ttl'
 
 
 def load_knowledge_graph():
-    """
-    Loads the Turtle knowledge graph from the specified file path.
-    """
     try:
         if not os.path.exists(KG_FILE_PATH):
-            logger.error(f"Knowledge graph file not found at {KG_FILE_PATH}")
-            return False
+            logger.error(
+                f"Knowledge graph data file not found at {KG_FILE_PATH}")
+            # Create an empty file if it doesn't exist
+            with open(KG_FILE_PATH, 'w') as f:
+                f.write("""@prefix ex: <http://example.org/presentation#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+""")
+            logger.info(f"Created empty {KG_FILE_PATH} as it was not found.")
+
+        kg_graph.parse(ONTOLOGY_FILE_PATH, format="turtle")
         kg_graph.parse(KG_FILE_PATH, format="turtle")
         logger.info(
-            f"Knowledge graph loaded successfully from {KG_FILE_PATH}. Contains {len(kg_graph)} triples.")
+            f"Knowledge graph (ontology + initial data) loaded successfully. Contains {len(kg_graph)} triples.")
         return True
     except Exception as e:
         logger.error(f"Error loading knowledge graph: {e}")
@@ -65,18 +70,19 @@ if not load_knowledge_graph():
     logger.error(
         "Failed to load knowledge graph. Application may not function as expected.")
 
-# --- Helper Functions for Agent Logic ---
-
 
 def get_sparql_query_from_prompt(user_prompt: str) -> str | None:
-    """
-    Uses the Gemini LLM to generate a SPARQL query based on the user's natural language prompt.
-    The LLM is prompted to output a JSON object containing the SPARQL query.
-    """
     prefixes = """
-    PREFIX : <http://example.org/ontology/>
+    PREFIX ex: <http://example.org/presentation#>
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+    """
+
+    ontology_schema = """
+    Classes: ex:PresentationSection, ex:ScientificTopic, ex:ContentItem, ex:AudienceType, ex:PresentationPurpose, ex:NarrativeDevice, ex:TargetAudience, ex:ScientificDetail, ex:PresentationType
+    Object Properties: ex:hasRecommendedSection, ex:hasLogicalPredecessor, ex:hasLogicalSuccessor, ex:AppliesToSection, ex:isRelevantFor
+    Data Properties: ex:SectionName, ex:SectionPurpose, ex:sectionOrder, ex:sectionLength, ex:simplifyContentItem, ex:omitContentItem, ex:complexityLevel, ex:isEssential, ex:NarrativeFunction, ex:NarrativeEffectiveness, ex:detailImportanceLevel
     """
 
     llm_prompt = f"""
@@ -85,57 +91,55 @@ def get_sparql_query_from_prompt(user_prompt: str) -> str | None:
     The knowledge graph has the following structure and prefixes:
 
     {prefixes}
-
-    Classes: :Book, :Author
-    Properties: :title, :author, :genre, :publicationYear, :name, :birthYear, :nationality
+    {ontology_schema}
 
     Here are some examples of how to convert natural language to SPARQL queries based on the provided schema:
 
-    User: "What is the title of the book by J.K. Rowling?"
+    User: "Which standard presentation sections should be included for Artificial Intelligence?"
     SPARQL:
     ```json
     {{
-      "sparql_query": "SELECT ?title WHERE {{ ?book a :Book ; :author ?author ; :title ?title . ?author :name 'J.K. Rowling' . }}"
+      "sparql_query": "SELECT ?sectionName WHERE {{ ex:ArtificialIntelligence ex:hasRecommendedSection ?section . ?section ex:SectionName ?sectionName . }}"
     }}
     ```
 
-    User: "Who wrote the book '1984'?"
+    User: "What is the recommended order of sections for the 'Introduction to AI' section?"
     SPARQL:
     ```json
     {{
-      "sparql_query": "SELECT ?authorName WHERE {{ ?book a :Book ; :title '1984' ; :author ?author . ?author :name ?authorName . }}"
+      "sparql_query": "SELECT ?order WHERE {{ ?section ex:SectionName "Introduction to AI" ; ex:sectionOrder ?order . }}"
     }}
     ```
 
-    User: "What are the genres of books published in 1945?"
+    User: "Which content items should be simplified when discussing Deep Learning?"
     SPARQL:
     ```json
     {{
-      "sparql_query": "SELECT DISTINCT ?genre WHERE {{ ?book a :Book ; :publicationYear '1945'^^xsd:gYear ; :genre ?genre . }}"
+      "sparql_query": "SELECT ?contentItem WHERE {{ ?contentItem ex:simplifyContentItem "Explain in simple terms" . }}"
     }}
     ```
 
-    User: "List all authors and their nationalities."
+    User: "What narrative devices are applicable to enhance coherence across multiple sections, specifically for 'MethodologySection'?"
     SPARQL:
     ```json
     {{
-      "sparql_query": "SELECT ?authorName ?nationality WHERE {{ ?author a :Author ; :name ?authorName ; :nationality ?nationality . }}"
+      "sparql_query": "SELECT ?device ?function WHERE {{ ?device ex:AppliesToSection ex:A_Methodology ; ex:NarrativeFunction ?function . }}"
     }}
     ```
 
-    User: "Which books were written by British authors?"
+    User: "Which scientific details are most relevant for Domain Experts?"
     SPARQL:
     ```json
     {{
-      "sparql_query": "SELECT ?bookTitle WHERE {{ ?book a :Book ; :title ?bookTitle ; :author ?author . ?author :nationality 'British' . }}"
+      "sparql_query": "SELECT ?detail WHERE {{ ?detail ex:isRelevantFor ex:DomainExperts ; ex:detailImportanceLevel "High" . }}"
     }}
     ```
-
-    User: "Who was born in 1903?"
+    
+    User: "What section has order 1?"
     SPARQL:
     ```json
     {{
-      "sparql_query": "SELECT ?authorName WHERE {{ ?author a :Author ; :name ?authorName ; :birthYear '1903'^^xsd:gYear . }}"
+      "sparql_query": "SELECT ?sectionName WHERE {{ ?section ex:sectionOrder \"1\"^^xsd:integer ; ex:SectionName ?sectionName . }}"
     }}
     ```
 
@@ -145,7 +149,7 @@ def get_sparql_query_from_prompt(user_prompt: str) -> str | None:
     SPARQL:
     """
     try:
-        response = model.generate_content(
+        response = llm_model.generate_content(
             [llm_prompt],
             generation_config=genai.types.GenerationConfig(
                 response_mime_type="application/json",
@@ -180,9 +184,6 @@ def get_sparql_query_from_prompt(user_prompt: str) -> str | None:
 
 
 def execute_sparql_query(query: str) -> list[dict]:
-    """
-    Executes a SPARQL query against the loaded knowledge graph and returns results as a list of dictionaries.
-    """
     results_list = []
     try:
         results = kg_graph.query(query)
@@ -191,7 +192,6 @@ def execute_sparql_query(query: str) -> list[dict]:
             for var in results.vars:
                 value = row[var]
                 if isinstance(value, URIRef):
-                    # For URIRefs, extract the last part of the URI for cleaner display
                     clean_value = str(value).split('/')[-1].replace('_', ' ')
                     row_dict[str(var)] = clean_value
                 elif isinstance(value, Literal):
@@ -207,64 +207,173 @@ def execute_sparql_query(query: str) -> list[dict]:
         return []
 
 
-def synthesize_human_readable_response(user_prompt: str, query_results: list[dict]) -> str:
-    """
-    Uses the Gemini LLM to synthesize a human-readable response from the query results.
-    """
+def synthesize_human_readable_response(user_prompt: str, query_results: list[dict], data_generated: bool = False) -> str:
+    # Removed the data_generated_flag prefix from the user-facing response
+
     if not query_results:
         return "I couldn't find any information related to your request in the knowledge graph."
 
-    # Convert results to a more digestible string format for the LLM
-    # Example: [{"authorName": "J.K. Rowling"}, {"authorName": "George Orwell"}]
-    # becomes "authorName: J.K. Rowling, authorName: George Orwell"
-    results_string = ", ".join([
-        f"{key}: {value}" for result_dict in query_results for key, value in result_dict.items()
-    ])
+    # More nuanced response synthesis for clarity
+    if "sectionName" in query_results[0]:
+        sections = [res["sectionName"]
+                    for res in query_results if "sectionName" in res]
+        return f"The standard presentation sections are: {', '.join(sections)}."
+    elif "order" in query_results[0]:
+        orders = [res["order"] for res in query_results if "order" in res]
+        return f"The recommended order of sections is: {', '.join(orders)}."
+    elif "contentItem" in query_results[0]:
+        items = [res["contentItem"]
+                 for res in query_results if "contentItem" in res]
+        return f"The content items are: {', '.join(items)}."
+    elif "detail" in query_results[0]:
+        details = [res["detail"] for res in query_results if "detail" in res]
+        return f"The relevant scientific details are: {', '.join(details)}."
+    elif "device" in query_results[0] and "function" in query_results[0]:
+        devices = [
+            f"{res['device']} (Function: {res['function']})" for res in query_results]
+        return f"The applicable narrative devices are: {', '.join(devices)}."
+    else:
+        # Generic response for other query types
+        results_string = ", ".join([
+            f"{key}: {value}" for result_dict in query_results for key, value in result_dict.items()
+        ])
+        return f"Here's what I found: {results_string}"
 
-    llm_prompt = f"""
-    You are a helpful AI assistant that summarizes information from a knowledge graph.
-    Given the user's original question and the structured results from a knowledge graph query,
-    synthesize a concise, natural language answer. If the results are empty, state that no information was found.
 
-    Original Question: "{user_prompt}"
-    Knowledge Graph Results: {json.dumps(query_results)}
+def generate_data_for_topic(topic_name: str) -> str | None:
+    prefixes = """
+    PREFIX ex: <http://example.org/presentation#>
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+    """
 
-    Synthesized Answer:
+    ontology_schema = """
+    Classes: ex:PresentationSection, ex:ScientificTopic, ex:ContentItem, ex:AudienceType, ex:PresentationPurpose, ex:NarrativeDevice, ex:TargetAudience, ex:ScientificDetail, ex:PresentationType
+    Object Properties: ex:hasRecommendedSection, ex:hasLogicalPredecessor, ex:hasLogicalSuccessor, ex:AppliesToSection, ex:isRelevantFor
+    Data Properties: ex:SectionName, ex:SectionPurpose, ex:sectionOrder, ex:sectionLength, ex:simplifyContentItem, ex:omitContentItem, ex:complexityLevel, ex:isEssential, ex:NarrativeFunction, ex:NarrativeEffectiveness, ex:detailImportanceLevel
+    """
+
+    llm_prompt_data_gen = f"""
+    You are an expert in RDF and Turtle syntax, and a domain expert in presentation structures for scientific topics.
+    Your task is to generate realistic and schema-compliant RDF triples in Turtle format for a given scientific topic, based on the provided ontology.
+    The generated data should describe a typical presentation structure for the topic, including:
+    - The scientific topic itself (an instance of ex:ScientificTopic).
+    - Recommended presentation sections for this topic (instances of ex:PresentationSection).
+    - For each section: SectionName, SectionPurpose, sectionOrder (as xsd:integer), sectionLength (e.g., "5 slides").
+    - Logical predecessors and successors between relevant sections.
+    - At least one relevant content item (ex:ContentItem) with its complexity and essentiality.
+    - At least one relevant narrative device (ex:NarrativeDevice) with its function and effectiveness.
+    - At least one scientific detail (ex:ScientificDetail) with its relevance for an audience type and importance level.
+
+    Ensure all URIs are unique and follow conventions (e.g., ex:TopicName for topics, ex:SectionName for sections).
+    Do NOT generate any introductory or concluding text, explanations, or markdown fences (```turtle```). Output ONLY the Turtle triples.
+
+    Ontology Schema and Prefixes:
+    {prefixes}
+    {ontology_schema}
+
+    Scientific Topic for which to generate data: "{topic_name}"
+    Generated Turtle:
     """
     try:
-        response = model.generate_content([llm_prompt])
+        response = llm_model.generate_content([llm_prompt_data_gen])
         if response.candidates and response.candidates[0].content and response.candidates[0].content.parts:
-            synthesized_text = response.candidates[0].content.parts[0].text
-            logger.info(
-                f"Raw LLM (response synthesis) text: {synthesized_text}")
-            return synthesized_text
+            generated_turtle = response.candidates[0].content.parts[0].text.strip(
+            )
+            logger.info(f"LLM generated data (Turtle): \n{generated_turtle}")
+            return generated_turtle
         else:
             logger.warning(
-                "LLM (response synthesis) response did not contain expected content.")
-            return "I couldn't generate a clear answer based on the results."
+                "LLM (data generation) response did not contain expected content.")
+            return None
     except Exception as e:
-        logger.error(
-            f"Error synthesizing human-readable response with LLM: {e}")
-        return "An error occurred while synthesizing the answer."
+        logger.error(f"Error calling LLM for data generation: {e}")
+        return None
 
 
-# --- API Endpoints ---
+def extract_scientific_topic_from_query(sparql_query: str) -> str | None:
+    # Attempt to find a scientific topic URI in the SPARQL query
+    # This is a heuristic and might need refinement based on query patterns
+    match = re.search(
+        r'ex:([A-Za-z0-9_]+)\s+ex:hasRecommendedSection', sparql_query)
+    if match:
+        # Return "Artificial Intelligence" from ex:ArtificialIntelligence
+        return match.group(1).replace('_', ' ')
+    return None
+
+
+@app.route('/get_graph_data', methods=['POST'])
+def get_graph_data():
+    logger.info("Received request to get graph data.")
+    try:
+        nodes = []
+        links = []
+        node_ids = set()  # Use a set to track node IDs already added
+
+        for s, p, o in kg_graph:
+            # Process Subject (s)
+            s_id = str(s)
+            s_name = s_id.split('/')[-1].replace('_', ' ')
+            if s_id not in node_ids:
+                nodes.append({"id": s_id, "name": s_name})
+                node_ids.add(s_id)
+
+            # Process Object (o)
+            o_id = None  # Initialize o_id for safety
+            o_name = None
+
+            if isinstance(o, URIRef):
+                o_id = str(o)
+                o_name = o_id.split('/')[-1].replace('_', ' ')
+                if o_id not in node_ids:  # Add object node only if it's new
+                    nodes.append({"id": o_id, "name": o_name})
+                    node_ids.add(o_id)
+            elif isinstance(o, Literal):
+                # For literals, create a unique ID based on subject, predicate, and literal value
+                o_id = f"literal_{s_id}_{p}_{o}"
+                o_name = str(o)
+                # Add literal node only if this unique ID is new
+                if o_id not in node_ids:
+                    nodes.append(
+                        {"id": o_id, "name": o_name, "isLiteral": True})
+                    node_ids.add(o_id)
+            else:
+                # Fallback for unexpected 'o' types, treat as URI string
+                # This block should ideally not be hit for valid RDF, as 'o' is always a URIRef or a Literal.
+                o_id = str(o)
+                o_name = o_id.split('/')[-1].replace('_', ' ')
+                if o_id not in node_ids:
+                    nodes.append({"id": o_id, "name": o_name})
+                    node_ids.add(o_id)
+
+            # Process Predicate (p) and add Link
+            p_label = str(p).split('/')[-1].replace('_', ' ')
+
+            # Exclude rdf:type, rdfs:domain, rdfs:range from direct links for cleaner visualization
+            if p != URIRef("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") and \
+               p != URIRef("http://www.w3.org/2000/01/rdf-schema#domain") and \
+               p != URIRef("http://www.w3.org/2000/01/rdf-schema#range"):
+                links.append(
+                    {"source": s_id, "target": o_id, "label": p_label})
+
+        logger.info(
+            f"Successfully extracted graph data: {len(nodes)} nodes, {len(links)} links.")
+        return jsonify({"nodes": nodes, "links": links})
+
+    except Exception as e:
+        logger.error(f"Error extracting graph data: {e}")
+        return jsonify({"error": f"Failed to get graph data: {e}"}), 500
+
 
 @app.route('/')
 def home():
-    """
-    A simple home route to confirm the server is running.
-    """
     logger.info("Home route accessed.")
     return "AI Knowledge Graph Agent Backend is running!"
 
 
 @app.route('/query', methods=['POST'])
 def query_kg():
-    """
-    Endpoint for querying the knowledge graph with a natural language prompt.
-    This is where the core AI agent logic is implemented.
-    """
     if not request.is_json:
         logger.warning("Received non-JSON request to /query endpoint.")
         return jsonify({"error": "Request must be JSON"}), 400
@@ -276,44 +385,77 @@ def query_kg():
 
     logger.info(f"Received prompt: '{user_prompt}'")
 
-    # Step 1: Use LLM to get SPARQL query from user prompt
     sparql_query = get_sparql_query_from_prompt(user_prompt)
+    data_generated_flag = False
+    generated_data_turtle = None
 
-    if not sparql_query:
-        logger.info("LLM failed to generate a SPARQL query (returned None).")
+    if not sparql_query or not sparql_query.strip():
+        logger.info(
+            "LLM failed to generate a SPARQL query (returned None or empty).")
         return jsonify({
             "user_prompt": user_prompt,
-            "agent_response": "I couldn't understand your request to form a query. Please try rephrasing."
-        })
-    elif not sparql_query.strip():
-        logger.info("LLM generated an empty or whitespace-only SPARQL query.")
-        return jsonify({
-            "user_prompt": user_prompt,
-            "agent_response": "I couldn't formulate a relevant query based on your request. Please try rephrasing."
+            "agent_response": "I couldn't understand your request to form a query. Please try rephrasing.",
+            "sparql_query": "",
+            "raw_query_results": []
         })
 
     logger.info(f"Generated SPARQL query:\n{sparql_query}")
-
-    # Step 2: Execute the generated SPARQL query
     query_results = execute_sparql_query(sparql_query)
 
-    # Step 3: Use LLM to synthesize human-readable response from query_results.
-    # Pass both user_prompt and query_results to the synthesis function
+    # If query results are empty, attempt to generate data
+    if not query_results:
+        logger.info(
+            "Query returned no results. Attempting to generate data dynamically.")
+
+        # Heuristic: Try to extract a scientific topic from the SPARQL query itself
+        topic = extract_scientific_topic_from_query(sparql_query)
+
+        if topic:
+            logger.info(f"Detected topic for data generation: {topic}")
+            generated_data_turtle = generate_data_for_topic(topic)
+            if generated_data_turtle:
+                try:
+                    temp_graph = Graph()
+                    temp_graph.parse(
+                        data=generated_data_turtle, format="turtle")
+                    for s, p, o in temp_graph:
+                        kg_graph.add((s, p, o))
+                    logger.info(
+                        f"Dynamically added {len(temp_graph)} triples to the knowledge graph for topic '{topic}'.")
+                    data_generated_flag = True
+                    # Re-execute the original SPARQL query against the now-updated graph
+                    query_results = execute_sparql_query(sparql_query)
+                except Exception as parse_error:
+                    logger.error(
+                        f"Error parsing dynamically generated Turtle: {parse_error}. Generated Turtle: \n{generated_data_turtle}")
+                    # Reset flag as data addition failed
+                    data_generated_flag = False
+                    # Keep generated_data_turtle for debugging in frontend if parsing failed
+                    generated_data_turtle = f"Error parsing generated data: {parse_error}\nGenerated:\n{generated_data_turtle}"
+            else:
+                logger.warning(
+                    f"LLM failed to generate data for topic: {topic}.")
+        else:
+            logger.info(
+                "Could not extract a scientific topic from the query for dynamic data generation.")
+
     agent_final_response = synthesize_human_readable_response(
-        user_prompt, query_results)
+        user_prompt, query_results, data_generated_flag)
 
     logger.info(f"Query results: {query_results}")
     logger.info(f"Agent's final response: {agent_final_response}")
 
-    return jsonify({
+    response_payload = {
         "user_prompt": user_prompt,
-        "sparql_query": sparql_query,  # Still include for debugging/transparency
-        "raw_query_results": query_results,  # Still include for debugging/transparency
-        # This is the new, human-readable response!
+        "sparql_query": sparql_query,
+        "raw_query_results": query_results,
         "agent_response": agent_final_response
-    })
+    }
+    if generated_data_turtle:  # Only add if data was actually attempted to be generated
+        response_payload["added_triples"] = generated_data_turtle
+
+    return jsonify(response_payload)
 
 
-# --- Main entry point for running the Flask app ---
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
