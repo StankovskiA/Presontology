@@ -1,4 +1,4 @@
-import React, { useState, type FormEvent, useRef, useEffect, KeyboardEvent, useCallback } from 'react';
+import React, { useState, type FormEvent, useRef, useEffect, type KeyboardEvent, useCallback } from 'react';
 import { Send, Loader2, Network, MessageSquareText, Search } from 'lucide-react';
 import ForceGraph2D from 'react-force-graph-2d';
 
@@ -49,12 +49,10 @@ function App() {
   const [graphDataLoading, setGraphDataLoading] = useState<boolean>(false);
   const [graphDataError, setGraphDataError] = useState<string | null>(null);
 
-  // Suggested questions are now purely query-based
   const suggestedQuestions = [
     "Which standard presentation sections should be included for Artificial Intelligence?",
-    "What is the recommended order of sections for the 'Introduction to AI' section?",
-    "Which scientific details are most relevant for Domain Experts?",
-    "What sections are recommended for Quantum Physics?" // New topic, will trigger data generation
+    "What is the recommended order of sections for the 'Methodology of our biochemical engineering system' section?",
+    "Which quality indicators demonstrate scientific accuracy in data presentation and interpretation?"
   ];
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -206,6 +204,15 @@ function App() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-blue-100 p-4 font-inter">
       <div className={`bg-white p-6 rounded-2xl shadow-xl border border-gray-200 w-full flex ${showGraph ? 'max-w-screen-xl grid grid-cols-2 gap-6' : 'max-w-3xl flex-col h-[85vh] min-h-[500px]'}`}>
+        {messages.length === 0 && (
+          <div className="flex justify-center flex-shrink-0">
+            <img
+              src="/public/presontology.png"
+              alt="Presontology Agent Logo"
+              className="h-[300px] w-auto rounded-lg"
+            />
+          </div>
+        )}
 
         {showGraph && (
           <div className="flex flex-col items-center justify-center bg-gray-50 rounded-xl p-4 border border-gray-200 h-full overflow-hidden">
@@ -263,22 +270,12 @@ function App() {
           </div>
         )}
 
-        <div className={`flex flex-col ${showGraph ? 'h-full' : 'h-[85vh] min-h-[500px]'}`}>
-          <h1 className="text-4xl font-extrabold text-center text-indigo-800 mb-6 flex-shrink-0">
-            <span role="img" aria-label="brain" className="mr-2">🧠</span> Presontology Agent
-          </h1>
-
-          <div className="mb-6 flex-shrink-0 flex justify-center gap-4 px-4">
-            {!showGraph ? (
-              <button
-                onClick={fetchGraphDataAndShow}
-                className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={graphDataLoading || isLoading}
-              >
-                <Network className="inline-block h-5 w-5 mr-2" /> Show Graph
-              </button>
-            ) : null}
-          </div>
+        <div className={`flex flex-col h-[85vh] min-h-[500px]`}>
+          {messages.length > 0 && (
+            <h1 className="text-4xl font-extrabold text-center text-indigo-800 mb-6 flex-shrink-0">
+              <span role="img" aria-label="brain" className="mr-2">🧠</span> Presontology Agent
+            </h1>
+          )}
 
           {messages.length === 0 && !isLoading && !showGraph && (
             <div className="flex-shrink-0 mb-6 px-4 py-3 border border-gray-300 rounded-xl bg-transparent space-y-3">
@@ -322,9 +319,9 @@ function App() {
                     )}
                     {/* Display query path for agent messages */}
                     {msg.type === 'agent' && (msg.sparqlQuery || msg.rawQueryResults || msg.addedTriples) && (
-                      <details className="mt-4 text-sm text-gray-600">
+                      <details className="mb-4 text-sm text-gray-600">
                         <summary className="cursor-pointer font-medium text-blue-700 hover:text-blue-900">
-                          Details (Path)
+                          Details
                         </summary>
                         <div className="mt-2 space-y-2 bg-blue-100 p-4 rounded-md">
                           {msg.sparqlQuery && (
@@ -357,7 +354,7 @@ function App() {
                               onClick={fetchGraphDataAndShow}
                               className="mt-2 px-4 py-2 bg-indigo-700 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 transition duration-200 text-sm"
                             >
-                              <Network className="inline-block h-4 w-4 mr-1" /> Show Updated Graph
+                              <Network className="inline-block h-4 w-4 mr-1" /> Show Graph
                             </button>
                           )}
                         </div>

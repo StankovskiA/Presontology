@@ -29,3 +29,4 @@ yarn-error.log*
 .eslintcache
 .prettierrc.local
 " > .gitignore
+generated_data_*
