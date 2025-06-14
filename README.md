@@ -2,13 +2,14 @@
 ## Project Overview
 
 The Presentology Agent is an interactive web application designed to assist researchers in developing and refining scientific presentations. It operates on a dynamic knowledge graph, built upon a specialized ontology, to provide intelligent responses to natural language queries. A key feature is its ability to dynamically extend its knowledge base by generating new RDF triples when it encounters a query that cannot be answered by existing data.
-<details><summary>Images of the web app</summary>
+Images of the web app
+
 ![image](https://github.com/user-attachments/assets/c09eb385-b794-4962-94ef-ecf210909e3b)
 ![image](https://github.com/user-attachments/assets/9235151f-edeb-4dec-b8e7-b24fc54ba2a1)
 ![image](https://github.com/user-attachments/assets/37022ae0-d49f-4b8f-b201-0722ce308925)
 ![image](https://github.com/user-attachments/assets/d865de2f-135c-44e0-a61e-b2a8c11e3ed2)
 
-</details>
+
 
 ## Features
 
